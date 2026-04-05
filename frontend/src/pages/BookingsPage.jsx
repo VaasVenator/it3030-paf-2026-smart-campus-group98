@@ -8,7 +8,7 @@ export default function BookingsPage() {
   return (
     <section>
       <PageHeader
-        eyebrow="Module B"
+        eyebrow=""
         title="Booking workflow"
         description="View booking requests and their approval lifecycle from the backend."
       />

@@ -8,7 +8,7 @@ export default function ResourcesPage() {
   return (
     <section>
       <PageHeader
-        eyebrow="Module A"
+        eyebrow=""
         title="Facilities and assets catalogue"
         description="Browse lecture halls, labs, rooms, and equipment from the backend resource service."
       />

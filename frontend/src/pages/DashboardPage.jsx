@@ -39,14 +39,13 @@ export default function DashboardPage() {
   return (
     <section>
       <PageHeader
-        eyebrow="Operations Snapshot"
+        eyebrow=""
         title="Campus control center"
         description="This starter dashboard is wired to the Spring Boot API and gives your group a clean base for the final React client."
       />
 
       <div className="hero-panel">
         <div>
-          <p className="hero-kicker">Ready for the assignment brief</p>
           <h3>Build out approval flows, ticket comments, Google login, and polished UI from here.</h3>
         </div>
         <p className="hero-note">

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { NavLink, Route, Routes } from "react-router-dom";
 import DashboardPage from "./pages/DashboardPage";
 import ResourcesPage from "./pages/ResourcesPage";
@@ -14,11 +15,12 @@ const navItems = [
 ];
 
 export default function App() {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
   return (
-    <div className="shell">
-      <aside className="sidebar">
+    <div className={`shell ${sidebarOpen ? "shell-sidebar-open" : "shell-sidebar-closed"}`}>
+      <aside className={`sidebar ${sidebarOpen ? "sidebar-open" : "sidebar-closed"}`}>
         <div className="brand">
-          <p className="brand-kicker">SLIIT PAF 2026</p>
           <h1>Smart Campus Hub</h1>
           <p className="brand-copy">
             Facilities, bookings, maintenance, and notifications in one place.
@@ -34,6 +36,11 @@ export default function App() {
               className={({ isActive }) =>
                 isActive ? "nav-link nav-link-active" : "nav-link"
               }
+              onClick={() => {
+                if (window.innerWidth <= 920) {
+                  setSidebarOpen(false);
+                }
+              }}
             >
               {item.label}
             </NavLink>
@@ -42,6 +49,14 @@ export default function App() {
       </aside>
 
       <main className="content">
+        <button
+          type="button"
+          className="sidebar-toggle"
+          onClick={() => setSidebarOpen((current) => !current)}
+        >
+          {sidebarOpen ? "Hide menu" : "Show menu"}
+        </button>
+
         <Routes>
           <Route path="/" element={<DashboardPage />} />
           <Route path="/resources" element={<ResourcesPage />} />

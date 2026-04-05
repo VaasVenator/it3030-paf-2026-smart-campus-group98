@@ -8,7 +8,7 @@ export default function NotificationsPage() {
   return (
     <section>
       <PageHeader
-        eyebrow="Module D"
+        eyebrow=""
         title="Notification center"
         description="Expose booking, ticket, and comment notifications from the backend."
       />

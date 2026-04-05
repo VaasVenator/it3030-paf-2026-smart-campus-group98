@@ -8,7 +8,7 @@ export default function TicketsPage() {
   return (
     <section>
       <PageHeader
-        eyebrow="Module C"
+        eyebrow=""
         title="Maintenance and incident ticketing"
         description="Track issue reports, priorities, assigned technicians, and status changes."
       />
