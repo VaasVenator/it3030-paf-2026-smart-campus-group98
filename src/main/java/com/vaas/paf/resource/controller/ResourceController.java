@@ -1,7 +1,5 @@
 package com.vaas.paf.resource.controller;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vaas.paf.resource.dto.CreateResourceRequest;
+import com.vaas.paf.resource.dto.ResourceListResponse;
 import com.vaas.paf.resource.dto.ResourceResponse;
 import com.vaas.paf.resource.dto.UpdateResourceRequest;
 import com.vaas.paf.resource.model.ResourceStatus;
@@ -40,12 +39,16 @@ public class ResourceController {
 	}
 
 	@GetMapping
-	public List<ResourceResponse> findAll(
+	public ResourceListResponse findAll(
 			@RequestParam(required = false) ResourceType type,
 			@RequestParam(required = false) Integer minCapacity,
 			@RequestParam(required = false) String location,
-			@RequestParam(required = false) ResourceStatus status) {
-		return resourceService.findAll(type, minCapacity, location, status);
+			@RequestParam(required = false) ResourceStatus status,
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "12") int size,
+			@RequestParam(defaultValue = "name") String sortBy,
+			@RequestParam(defaultValue = "ASC") String sortOrder) {
+		return resourceService.findAll(type, minCapacity, location, status, page, size, sortBy, sortOrder);
 	}
 
 	@GetMapping("/{id}")
