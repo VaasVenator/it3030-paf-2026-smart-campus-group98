@@ -22,21 +22,19 @@ public class RequestUserFilter extends OncePerRequestFilter {
 			HttpServletRequest request,
 			HttpServletResponse response,
 			FilterChain filterChain) throws ServletException, IOException {
-		String userId = headerOrDefault(request, "X-User-Id", "demo-user");
-		String userName = headerOrDefault(request, "X-User-Name", "Demo User");
-		String roleValue = headerOrDefault(request, "X-User-Role", "USER");
-		UserRole role = UserRole.valueOf(roleValue.toUpperCase());
-		RequestUserContext.setCurrentUser(new AuthenticatedUser(userId, userName, role));
+		String userId = request.getHeader("X-User-Id");
+		String userName = request.getHeader("X-User-Name");
+		String roleValue = request.getHeader("X-User-Role");
+
+		if (userId != null && !userId.isBlank() && userName != null && !userName.isBlank() && roleValue != null && !roleValue.isBlank()) {
+			UserRole role = UserRole.valueOf(roleValue.toUpperCase());
+			RequestUserContext.setCurrentUser(new AuthenticatedUser(userId, userName, role));
+		}
 
 		try {
 			filterChain.doFilter(request, response);
 		} finally {
 			RequestUserContext.clear();
 		}
-	}
-
-	private String headerOrDefault(HttpServletRequest request, String name, String fallback) {
-		String value = request.getHeader(name);
-		return value == null || value.isBlank() ? fallback : value;
 	}
 }

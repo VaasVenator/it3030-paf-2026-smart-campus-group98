@@ -1,12 +1,22 @@
 package com.vaas.paf.resource.service;
 
 import java.util.List;
+import java.util.Locale;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.vaas.paf.common.AppException;
 import com.vaas.paf.resource.dto.CreateResourceRequest;
+import com.vaas.paf.resource.dto.ResourceListResponse;
 import com.vaas.paf.resource.dto.ResourceResponse;
 import com.vaas.paf.resource.dto.UpdateResourceRequest;
 import com.vaas.paf.resource.model.ResourceDocument;
@@ -18,13 +28,17 @@ import com.vaas.paf.security.UserRole;
 
 @Service
 public class ResourceService {
+	private static final Logger logger = LoggerFactory.getLogger(ResourceService.class);
+	private static final List<String> ALLOWED_SORT_FIELDS = List.of("name", "type", "capacity", "location", "status");
 
 	private final ResourceRepository resourceRepository;
 	private final AccessGuard accessGuard;
+	private final MongoTemplate mongoTemplate;
 
-	public ResourceService(ResourceRepository resourceRepository, AccessGuard accessGuard) {
+	public ResourceService(ResourceRepository resourceRepository, AccessGuard accessGuard, MongoTemplate mongoTemplate) {
 		this.resourceRepository = resourceRepository;
 		this.accessGuard = accessGuard;
+		this.mongoTemplate = mongoTemplate;
 	}
 
 	public ResourceResponse create(CreateResourceRequest request) {
@@ -42,17 +56,56 @@ public class ResourceService {
 				.amenities(request.amenities() == null ? List.of() : request.amenities())
 				.build();
 
-		return toResponse(resourceRepository.save(resource));
+		ResourceDocument saved = resourceRepository.save(resource);
+		logger.info("Resource created by {}: {}", accessGuard.currentUser().userId(), saved.getId());
+		return toResponse(saved);
 	}
 
-	public List<ResourceResponse> findAll(ResourceType type, Integer minCapacity, String location, ResourceStatus status) {
-		return resourceRepository.findAll().stream()
-				.filter(resource -> type == null || resource.getType() == type)
-				.filter(resource -> minCapacity == null || resource.getCapacity() >= minCapacity)
-				.filter(resource -> location == null || resource.getLocation().toLowerCase().contains(location.toLowerCase()))
-				.filter(resource -> status == null || resource.getStatus() == status)
+	public ResourceListResponse findAll(
+			ResourceType type,
+			Integer minCapacity,
+			String location,
+			ResourceStatus status,
+			int page,
+			int size,
+			String sortBy,
+			String sortOrder) {
+		if (page < 0) {
+			throw new AppException(HttpStatus.BAD_REQUEST, "Page must be 0 or greater.");
+		}
+		if (size <= 0 || size > 100) {
+			throw new AppException(HttpStatus.BAD_REQUEST, "Size must be between 1 and 100.");
+		}
+
+		String normalizedSortBy = normalizeSortBy(sortBy);
+		Sort.Direction direction = parseDirection(sortOrder);
+
+		Query baseQuery = new Query();
+		if (type != null) {
+			baseQuery.addCriteria(Criteria.where("type").is(type));
+		}
+		if (minCapacity != null) {
+			baseQuery.addCriteria(Criteria.where("capacity").gte(minCapacity));
+		}
+		if (location != null && !location.isBlank()) {
+			baseQuery.addCriteria(Criteria.where("location").regex(location.trim(), "i"));
+		}
+		if (status != null) {
+			baseQuery.addCriteria(Criteria.where("status").is(status));
+		}
+
+		long totalElements = mongoTemplate.count(baseQuery, ResourceDocument.class);
+		int totalPages = (int) Math.ceil(totalElements / (double) size);
+
+		Pageable pageable = PageRequest.of(page, size, Sort.by(direction, normalizedSortBy));
+		Query dataQuery = baseQuery.with(pageable);
+
+		List<ResourceResponse> content = mongoTemplate.find(dataQuery, ResourceDocument.class)
+				.stream()
 				.map(this::toResponse)
 				.toList();
+
+		return new ResourceListResponse(content, totalElements, totalPages, page, size);
 	}
 
 	public ResourceResponse findById(String id) {
@@ -78,7 +131,9 @@ public class ResourceService {
 		resource.setStatus(request.status());
 		resource.setAmenities(request.amenities() == null ? List.of() : request.amenities());
 
-		return toResponse(resourceRepository.save(resource));
+		ResourceDocument saved = resourceRepository.save(resource);
+		logger.info("Resource updated by {}: {}", accessGuard.currentUser().userId(), saved.getId());
+		return toResponse(saved);
 	}
 
 	public void delete(String id) {
@@ -87,6 +142,26 @@ public class ResourceService {
 			throw new AppException(HttpStatus.NOT_FOUND, "Resource not found.");
 		}
 		resourceRepository.deleteById(id);
+		logger.info("Resource deleted by {}: {}", accessGuard.currentUser().userId(), id);
+	}
+
+	private String normalizeSortBy(String sortBy) {
+		String normalized = sortBy == null ? "name" : sortBy.trim().toLowerCase(Locale.ROOT);
+		if (!ALLOWED_SORT_FIELDS.contains(normalized)) {
+			throw new AppException(HttpStatus.BAD_REQUEST, "Invalid sortBy value.");
+		}
+		return normalized;
+	}
+
+	private Sort.Direction parseDirection(String sortOrder) {
+		if (sortOrder == null || sortOrder.isBlank()) {
+			return Sort.Direction.ASC;
+		}
+		try {
+			return Sort.Direction.fromString(sortOrder);
+		} catch (IllegalArgumentException exception) {
+			throw new AppException(HttpStatus.BAD_REQUEST, "Invalid sortOrder value.");
+		}
 	}
 
 	private void validateAvailabilityWindow(java.time.LocalTime start, java.time.LocalTime end) {
