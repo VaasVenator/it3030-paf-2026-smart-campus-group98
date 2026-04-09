@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
+import { Link, NavLink, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { useAuth } from "./auth/AuthContext";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import DashboardPage from "./pages/DashboardPage";
@@ -42,6 +42,7 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/oauth-success" element={<OAuthSuccessPage />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </main>
     );
@@ -106,9 +107,7 @@ export default function App() {
           <Route
             path="/"
             element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
+              user ? <DashboardPage /> : <Navigate to="/login" replace />
             }
           />
           <Route
@@ -154,6 +153,7 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/oauth-success" element={<OAuthSuccessPage />} />
+          <Route path="*" element={<Navigate to={user ? "/" : "/login"} replace />} />
         </Routes>
       </main>
     </div>
