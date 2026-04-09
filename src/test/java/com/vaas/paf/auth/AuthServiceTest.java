@@ -20,6 +20,8 @@ import com.vaas.paf.auth.model.UserDocument;
 import com.vaas.paf.auth.repo.UserRepository;
 import com.vaas.paf.auth.service.AuthService;
 import com.vaas.paf.common.AppException;
+import com.vaas.paf.security.AccessGuard;
+import com.vaas.paf.security.AuthenticatedUser;
 import com.vaas.paf.security.UserRole;
 
 class AuthServiceTest {
@@ -30,12 +32,15 @@ class AuthServiceTest {
 	@Mock
 	private PasswordEncoder passwordEncoder;
 
+	@Mock
+	private AccessGuard accessGuard;
+
 	private AuthService authService;
 
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.openMocks(this);
-		authService = new AuthService(userRepository, passwordEncoder);
+		authService = new AuthService(userRepository, passwordEncoder, accessGuard);
 	}
 
 	@Test
@@ -81,5 +86,31 @@ class AuthServiceTest {
 		var response = authService.signup(request);
 		assertEquals("user-1", response.userId());
 		assertEquals("IT12345678", response.studentId());
+	}
+
+	@Test
+	void updateProfileShouldRejectMismatchedNewPasswords() {
+		UserDocument user = UserDocument.builder()
+				.id("user-1")
+				.studentId("IT12345678")
+				.username("sahan")
+				.firstName("Sahan")
+				.lastName("Vaas")
+				.passwordHash("hashed")
+				.role(UserRole.USER)
+				.build();
+
+		when(accessGuard.currentUser()).thenReturn(new AuthenticatedUser("user-1", "Sahan Vaas", UserRole.USER));
+		when(userRepository.findById("user-1")).thenReturn(Optional.of(user));
+
+		AppException exception = assertThrows(
+				AppException.class,
+				() -> authService.updateCurrentUser(new com.vaas.paf.auth.dto.UpdateProfileRequest(
+						"sahan",
+						"Sahan",
+						"Vaas",
+						"password1",
+						"password2")));
+		assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
 	}
 }

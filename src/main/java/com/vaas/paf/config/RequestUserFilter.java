@@ -2,6 +2,7 @@ package com.vaas.paf.config;
 
 import java.io.IOException;
 
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -19,9 +20,9 @@ public class RequestUserFilter extends OncePerRequestFilter {
 
 	@Override
 	protected void doFilterInternal(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			FilterChain filterChain) throws ServletException, IOException {
+			@NonNull HttpServletRequest request,
+			@NonNull HttpServletResponse response,
+			@NonNull FilterChain filterChain) throws ServletException, IOException {
 		String userId = request.getHeader("X-User-Id");
 		String userName = request.getHeader("X-User-Name");
 		String roleValue = request.getHeader("X-User-Role");

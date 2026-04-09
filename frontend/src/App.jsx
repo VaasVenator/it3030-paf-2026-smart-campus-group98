@@ -9,6 +9,8 @@ import TicketsPage from "./pages/TicketsPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import ProfilePage from "./pages/ProfilePage";
+import OAuthSuccessPage from "./pages/OAuthSuccessPage";
 
 const navItems = [
   { to: "/", label: "Overview" },
@@ -22,7 +24,10 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const location = useLocation();
   const { user, logout } = useAuth();
-  const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
+  const isAuthPage =
+    location.pathname === "/login" ||
+    location.pathname === "/signup" ||
+    location.pathname === "/oauth-success";
 
   if (isAuthPage) {
     return (
@@ -36,6 +41,7 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/oauth-success" element={<OAuthSuccessPage />} />
         </Routes>
       </main>
     );
@@ -49,13 +55,6 @@ export default function App() {
           <p className="brand-copy">
             Facilities, bookings, maintenance, and notifications in one place.
           </p>
-          {user ? (
-            <div className="sidebar-user">
-              <strong>{user.displayName}</strong>
-              <span>{user.studentId}</span>
-              <span>{user.role}</span>
-            </div>
-          ) : null}
         </div>
 
         <nav className="nav">
@@ -84,13 +83,24 @@ export default function App() {
       </aside>
 
       <main className="content">
-        <button
-          type="button"
-          className="sidebar-toggle"
-          onClick={() => setSidebarOpen((current) => !current)}
-        >
-          {sidebarOpen ? "Hide menu" : "Show menu"}
-        </button>
+        <div className="content-toolbar">
+          <button
+            type="button"
+            className="sidebar-toggle"
+            onClick={() => setSidebarOpen((current) => !current)}
+          >
+            {sidebarOpen ? "Hide menu" : "Show menu"}
+          </button>
+
+          <div className="toolbar-actions">
+            <Link to="/profile" className="profile-icon-button" aria-label="Open profile page">
+              <span>{user?.firstName?.[0] ?? "U"}</span>
+            </Link>
+            <button type="button" className="logout-button toolbar-logout" onClick={logout}>
+              Log out
+            </button>
+          </div>
+        </div>
 
         <Routes>
           <Route
@@ -133,8 +143,17 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/oauth-success" element={<OAuthSuccessPage />} />
         </Routes>
       </main>
     </div>

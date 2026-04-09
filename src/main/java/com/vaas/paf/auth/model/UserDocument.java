@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.vaas.paf.auth.model.AuthProvider;
 import com.vaas.paf.security.UserRole;
 
 import lombok.AllArgsConstructor;
@@ -29,6 +30,9 @@ public class UserDocument {
 	@Indexed(unique = true)
 	private String username;
 
+	private String email;
+	private String googleSubject;
+	private AuthProvider authProvider;
 	private String firstName;
 	private String lastName;
 	private String passwordHash;

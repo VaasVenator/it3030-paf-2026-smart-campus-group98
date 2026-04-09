@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import { API_BASE_URL } from "../lib/api";
 
 export default function LoginPage() {
   const [studentId, setStudentId] = useState("");
@@ -66,6 +67,14 @@ export default function LoginPage() {
         </button>
         {error ? <p className="form-message form-message-error">{error}</p> : null}
       </form>
+
+      <div className="auth-divider">
+        <span>or</span>
+      </div>
+
+      <a className="secondary-button google-login-button" href={`${API_BASE_URL}/oauth2/authorization/google`}>
+        Continue with Google
+      </a>
 
       <p className="auth-footer">
         New here? <Link to="/signup">Create an account</Link>
