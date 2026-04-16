@@ -1,5 +1,5 @@
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8081";
+  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
 
 function buildHeaders(user, extraHeaders = {}) {
   const headers = {
@@ -66,6 +66,16 @@ export async function apiDelete(path, user, options = {}) {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method: "DELETE",
     headers: buildHeaders(user, options.headers),
+    credentials: options.credentials
+  });
+  return parseResponse(response);
+}
+
+export async function apiPatch(path, body, user, options = {}) {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method: "PATCH",
+    headers: buildHeaders(user, options.headers),
+    body: JSON.stringify(body),
     credentials: options.credentials
   });
   return parseResponse(response);
