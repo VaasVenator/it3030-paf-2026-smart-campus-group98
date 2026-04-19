@@ -60,8 +60,7 @@ public class TicketCommentService {
 				.createdAt(Instant.now())
 				.updatedAt(Instant.now())
 				.build();
-
-		TicketCommentDocument saved = ticketCommentRepository.save(comment);
+		@SuppressWarnings("null")		TicketCommentDocument saved = ticketCommentRepository.save(comment);
 		if (!ticket.getReporterId().equals(user.userId())) {
 			notificationService.createForUser(
 					ticket.getReporterId(),
@@ -96,8 +95,10 @@ public class TicketCommentService {
 	}
 
 	private TicketCommentDocument getComment(String commentId) {
-		return ticketCommentRepository.findById(commentId)
+		@SuppressWarnings("null")
+		TicketCommentDocument comment = ticketCommentRepository.findById(commentId)
 				.orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Comment not found."));
+		return comment;
 	}
 
 	private TicketCommentResponse toResponse(TicketCommentDocument comment) {

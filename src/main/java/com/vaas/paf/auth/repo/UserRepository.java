@@ -10,6 +10,8 @@ public interface UserRepository extends MongoRepository<UserDocument, String> {
 
 	Optional<UserDocument> findByStudentId(String studentId);
 
+	Optional<UserDocument> findByUsernameIgnoreCase(String username);
+
 	Optional<UserDocument> findByEmailIgnoreCase(String email);
 
 	Optional<UserDocument> findByGoogleSubject(String googleSubject);

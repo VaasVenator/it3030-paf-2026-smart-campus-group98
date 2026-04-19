@@ -34,7 +34,8 @@ public class NotificationService {
 				.read(false)
 				.createdAt(Instant.now())
 				.build();
-		notificationRepository.save(notification);
+		@SuppressWarnings({"null", "unused"})
+		NotificationDocument saved = notificationRepository.save(notification);
 	}
 
 	public List<NotificationResponse> currentUserNotifications() {
@@ -45,11 +46,14 @@ public class NotificationService {
 	}
 
 	public NotificationResponse markAsRead(String notificationId) {
+		@SuppressWarnings("null")
 		NotificationDocument notification = notificationRepository.findById(notificationId)
 				.orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Notification not found."));
 		accessGuard.requireOwnerOrRole(notification.getUserId());
 		notification.setRead(true);
-		return toResponse(notificationRepository.save(notification));
+		@SuppressWarnings("null")
+		NotificationResponse result = toResponse(notificationRepository.save(notification));
+		return result;
 	}
 
 	private NotificationResponse toResponse(NotificationDocument notification) {

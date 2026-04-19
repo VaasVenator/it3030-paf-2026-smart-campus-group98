@@ -77,7 +77,8 @@ class AuthServiceTest {
 		when(userRepository.existsByStudentId("IT12345678")).thenReturn(false);
 		when(userRepository.existsByUsernameIgnoreCase("sahan")).thenReturn(false);
 		when(passwordEncoder.encode("password1")).thenReturn("hashed");
-		when(userRepository.save(any(UserDocument.class))).thenAnswer(invocation -> {
+		@SuppressWarnings({"null", "unused"})
+		var saveAnswer = when(userRepository.save(any(UserDocument.class))).thenAnswer(invocation -> {
 			UserDocument user = invocation.getArgument(0);
 			user.setId("user-1");
 			return user;

@@ -5,47 +5,65 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 import DashboardPage from "./pages/DashboardPage";
 import ResourcesPage from "./pages/ResourcesPage";
 import BookingsPage from "./pages/BookingsPage";
+import AdminBookingsPage from "./pages/AdminBookingsPage";
 import TicketsPage from "./pages/TicketsPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import ProfilePage from "./pages/ProfilePage";
 import OAuthSuccessPage from "./pages/OAuthSuccessPage";
-
-const navItems = [
-  { to: "/", label: "Overview" },
-  { to: "/resources", label: "Resources" },
-  { to: "/bookings", label: "Bookings" },
-  { to: "/tickets", label: "Tickets" },
-  { to: "/notifications", label: "Notifications" }
-];
+import HomePage from "./pages/HomePage";
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const location = useLocation();
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
+
+  if (loading) {
+    return <div className="loading-screen">Loading...</div>;
+  }
+
+  const navItems = [
+    { to: "/dashboard", label: "Overview" },
+    { to: "/resources", label: "Resources" },
+    { to: "/bookings", label: "Bookings" },
+    { to: "/tickets", label: "Tickets" },
+    { to: "/notifications", label: "Notifications" },
+    ...(user?.role === "ADMIN"
+      ? [{ to: "/admin/bookings", label: "Admin Bookings" }]
+      : [])
+  ];
+
   const isAuthPage =
     location.pathname === "/login" ||
     location.pathname === "/signup" ||
     location.pathname === "/oauth-success";
 
-  if (isAuthPage) {
+  const isPublicPage = 
+    location.pathname === "/" ||
+    location.pathname === "/about" ||
+    location.pathname === "/contact";
+
+  // Show public pages (including auth pages) if not authenticated
+  if (!user && (isAuthPage || isPublicPage)) {
     return (
-      <main className="auth-shell">
-        <div className="auth-backdrop" />
-        <div className="auth-topbar">
-          <Link to="/login" className="auth-brand">
-            Smart Campus Hub
-          </Link>
-        </div>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/oauth-success" element={<OAuthSuccessPage />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </main>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/oauth-success" element={<OAuthSuccessPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     );
+  }
+
+  // Redirect unauthenticated users trying to access protected routes to login
+  if (!user) {
+    return <Navigate to="/login" replace />;
   }
 
   return (
@@ -63,7 +81,7 @@ export default function App() {
             <NavLink
               key={item.to}
               to={item.to}
-              end={item.to === "/"}
+              end={item.to === "/dashboard"}
               className={({ isActive }) =>
                 isActive ? "nav-link nav-link-active" : "nav-link"
               }
@@ -105,10 +123,12 @@ export default function App() {
 
         <Routes>
           <Route
+            path="/dashboard"
+            element={user ? <DashboardPage /> : <Navigate to="/login" replace />}
+          />
+          <Route
             path="/"
-            element={
-              user ? <DashboardPage /> : <Navigate to="/login" replace />
-            }
+            element={user ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />}
           />
           <Route
             path="/resources"
@@ -123,6 +143,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <BookingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/bookings"
+            element={
+              <ProtectedRoute>
+                <AdminBookingsPage />
               </ProtectedRoute>
             }
           />

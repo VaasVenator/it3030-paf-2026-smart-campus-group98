@@ -21,14 +21,14 @@ export function AuthProvider({ children }) {
   }, []);
 
   async function login(credentials) {
-    const signedInUser = await apiPost("/api/auth/login", credentials);
+    const signedInUser = await apiPost("/api/auth/login", credentials, null);
     setUser(signedInUser);
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(signedInUser));
     return signedInUser;
   }
 
   async function signup(payload) {
-    const signedUpUser = await apiPost("/api/auth/signup", payload);
+    const signedUpUser = await apiPost("/api/auth/signup", payload, null);
     setUser(signedUpUser);
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(signedUpUser));
     return signedUpUser;
@@ -49,6 +49,7 @@ export function AuthProvider({ children }) {
         credentials: "include"
       });
     } catch {
+      // Logout error can be ignored
     }
     setUser(null);
     window.localStorage.removeItem(STORAGE_KEY);

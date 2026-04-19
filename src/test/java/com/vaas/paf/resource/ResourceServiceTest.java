@@ -117,7 +117,8 @@ class ResourceServiceTest {
                 ResourceStatus.ACTIVE,
                 List.of("PCs", "Smart Board"));
 
-        when(resourceRepository.save(any(ResourceDocument.class))).thenAnswer(invocation -> {
+        @SuppressWarnings({"null", "unused"})
+        var saveAnswer = when(resourceRepository.save(any(ResourceDocument.class))).thenAnswer(invocation -> {
             ResourceDocument resource = invocation.getArgument(0);
             resource.setId("resource-1");
             return resource;

@@ -55,7 +55,9 @@ public class TicketService {
 				.updatedAt(Instant.now())
 				.build();
 
-		return toResponse(ticketRepository.save(ticket));
+		@SuppressWarnings("null")
+		TicketResponse result = toResponse(ticketRepository.save(ticket));
+		return result;
 	}
 
 	public List<TicketResponse> findAll() {
@@ -114,8 +116,10 @@ public class TicketService {
 	}
 
 	public TicketDocument getDocument(String ticketId) {
-		return ticketRepository.findById(ticketId)
+		@SuppressWarnings("null")
+		TicketDocument ticket = ticketRepository.findById(ticketId)
 				.orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Ticket not found."));
+		return ticket;
 	}
 
 	private void ensureTicketVisible(TicketDocument ticket) {

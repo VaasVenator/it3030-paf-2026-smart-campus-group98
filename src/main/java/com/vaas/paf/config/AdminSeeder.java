@@ -24,7 +24,7 @@ public class AdminSeeder implements ApplicationRunner {
 	public AdminSeeder(
 			UserRepository userRepository,
 			PasswordEncoder passwordEncoder,
-			@Value("${app.demo.admin.student-id:IT00000001}") String adminStudentId,
+		@Value("${app.demo.admin.student-id:STF00000001}") String adminStudentId,
 			@Value("${app.demo.admin.username:admin}") String adminUsername,
 			@Value("${app.demo.admin.password:Admin@1234}") String adminPassword) {
 		this.userRepository = userRepository;
@@ -36,10 +36,24 @@ public class AdminSeeder implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) {
+		// Check if admin with new studentId already exists
 		if (userRepository.existsByStudentId(adminStudentId)) {
 			return;
 		}
 
+		// Check if old admin exists (with username "admin")
+		java.util.Optional<UserDocument> existingAdmin = userRepository.findByUsernameIgnoreCase(adminUsername);
+		if (existingAdmin.isPresent()) {
+			// Update existing admin with new studentId
+			UserDocument admin = existingAdmin.get();
+			admin.setStudentId(adminStudentId);
+			admin.setPasswordHash(passwordEncoder.encode(adminPassword));
+			@SuppressWarnings({"null", "unused"})
+			UserDocument saved = userRepository.save(admin);
+			return;
+		}
+
+		// Create new admin if neither exists
 		UserDocument admin = UserDocument.builder()
 				.studentId(adminStudentId)
 				.username(adminUsername)
@@ -50,6 +64,7 @@ public class AdminSeeder implements ApplicationRunner {
 				.createdAt(Instant.now())
 				.build();
 
-		userRepository.save(admin);
+		@SuppressWarnings({"null", "unused"})
+		UserDocument saved = userRepository.save(admin);
 	}
 }

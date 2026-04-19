@@ -55,8 +55,7 @@ public class ResourceService {
 				.status(request.status())
 				.amenities(request.amenities() == null ? List.of() : request.amenities())
 				.build();
-
-		ResourceDocument saved = resourceRepository.save(resource);
+		@SuppressWarnings("null")		ResourceDocument saved = resourceRepository.save(resource);
 		logger.info("Resource created by {}: {}", accessGuard.currentUser().userId(), saved.getId());
 		return toResponse(saved);
 	}
@@ -88,7 +87,11 @@ public class ResourceService {
 			baseQuery.addCriteria(Criteria.where("capacity").gte(minCapacity));
 		}
 		if (location != null && !location.isBlank()) {
-			baseQuery.addCriteria(Criteria.where("location").regex(location.trim(), "i"));
+			@SuppressWarnings("null")
+			String param = location.trim();
+			@SuppressWarnings("null")
+			Criteria locationCriteria = Criteria.where("location").regex(param, "i");
+			baseQuery.addCriteria(locationCriteria);
 		}
 		if (status != null) {
 			baseQuery.addCriteria(Criteria.where("status").is(status));
@@ -97,6 +100,7 @@ public class ResourceService {
 		long totalElements = mongoTemplate.count(baseQuery, ResourceDocument.class);
 		int totalPages = (int) Math.ceil(totalElements / (double) size);
 
+		@SuppressWarnings("null")
 		Pageable pageable = PageRequest.of(page, size, Sort.by(direction, normalizedSortBy));
 		Query dataQuery = baseQuery.with(pageable);
 
@@ -113,8 +117,10 @@ public class ResourceService {
 	}
 
 	public ResourceDocument getDocument(String id) {
-		return resourceRepository.findById(id)
-				.orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Resource not found."));
+			@SuppressWarnings("null")
+			ResourceDocument resource = resourceRepository.findById(id)
+					.orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Resource not found."));
+			return resource;
 	}
 
 	public ResourceResponse update(String id, UpdateResourceRequest request) {
@@ -136,9 +142,12 @@ public class ResourceService {
 		return toResponse(saved);
 	}
 
+	@SuppressWarnings("null")
 	public void delete(String id) {
 		accessGuard.requireAnyRole(UserRole.ADMIN);
-		if (!resourceRepository.existsById(id)) {
+		@SuppressWarnings("null")
+		boolean exists = resourceRepository.existsById(id);
+		if (!exists) {
 			throw new AppException(HttpStatus.NOT_FOUND, "Resource not found.");
 		}
 		resourceRepository.deleteById(id);

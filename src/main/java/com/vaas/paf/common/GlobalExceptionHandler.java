@@ -18,8 +18,10 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(AppException.class)
 	public ResponseEntity<ApiError> handleAppException(AppException exception, HttpServletRequest request) {
+		@SuppressWarnings("null")
 		HttpStatus status = exception.getStatus();
-		return ResponseEntity.status(status)
+		@SuppressWarnings("null")
+		ResponseEntity<ApiError> response = ResponseEntity.status(status)
 				.body(new ApiError(
 						Instant.now(),
 						status.value(),
@@ -27,6 +29,7 @@ public class GlobalExceptionHandler {
 						exception.getMessage(),
 						request.getRequestURI(),
 						List.of()));
+		return response;
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)

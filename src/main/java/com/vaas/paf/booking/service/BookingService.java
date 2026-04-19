@@ -65,7 +65,9 @@ public class BookingService {
 				.updatedAt(Instant.now())
 				.build();
 
-		return toResponse(bookingRepository.save(booking));
+		@SuppressWarnings("null")
+		BookingResponse result = toResponse(bookingRepository.save(booking));
+		return result;
 	}
 
 	public List<BookingResponse> findAll(BookingStatus status) {
@@ -125,8 +127,10 @@ public class BookingService {
 	}
 
 	public BookingDocument getDocument(String bookingId) {
-		return bookingRepository.findById(bookingId)
-				.orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Booking not found."));
+			@SuppressWarnings("null")
+			BookingDocument booking = bookingRepository.findById(bookingId)
+					.orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Booking not found."));
+			return booking;
 	}
 
 	private void validateBookingRequest(CreateBookingRequest request, ResourceDocument resource) {

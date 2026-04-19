@@ -8,6 +8,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [loginMode, setLoginMode] = useState("student"); // "student" or "admin"
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -32,7 +33,16 @@ export default function LoginPage() {
   }
 
   return (
-    <section className="auth-card">
+    <div className="auth-shell">
+      <button 
+        type="button" 
+        className="back-button"
+        onClick={() => navigate("/")}
+        aria-label="Go back to home"
+      >
+        ← Back
+      </button>
+      <section className="auth-card">
       <div className="auth-copy">
         <p className="auth-eyebrow">Welcome back</p>
         <h2>Sign in to your campus workspace</h2>
@@ -42,11 +52,28 @@ export default function LoginPage() {
       </div>
 
       <form className="auth-form" onSubmit={handleSubmit}>
+        <div className="login-mode-toggle">
+          <button
+            type="button"
+            className={`login-mode-button ${loginMode === "student" ? "active" : ""}`}
+            onClick={() => setLoginMode("student")}
+          >
+            Student Login
+          </button>
+          <button
+            type="button"
+            className={`login-mode-button ${loginMode === "admin" ? "active" : ""}`}
+            onClick={() => setLoginMode("admin")}
+          >
+            Admin Login
+          </button>
+        </div>
+
         <label className="field">
-          <span>Student ID</span>
+          <span>{loginMode === "admin" ? "Admin ID" : "Student ID"}</span>
           <input
             type="text"
-            placeholder="IT12345678"
+            placeholder={loginMode === "admin" ? "STF00000001" : "IT12345678"}
             value={studentId}
             onChange={(event) => setStudentId(event.target.value)}
           />
@@ -80,5 +107,6 @@ export default function LoginPage() {
         New here? <Link to="/signup">Create an account</Link>
       </p>
     </section>
+    </div>
   );
 }

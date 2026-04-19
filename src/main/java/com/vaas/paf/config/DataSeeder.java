@@ -27,7 +27,8 @@ public class DataSeeder implements ApplicationRunner {
 			return;
 		}
 
-		resourceRepository.saveAll(List.of(
+		@SuppressWarnings({"null", "unused"})
+		var resources = resourceRepository.saveAll(List.of(
 				ResourceDocument.builder()
 						.name("Main Lecture Hall A")
 						.type(ResourceType.LECTURE_HALL)

@@ -6,7 +6,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.vaas.paf.auth.model.AuthProvider;
 import com.vaas.paf.security.UserRole;
 
 import lombok.AllArgsConstructor;

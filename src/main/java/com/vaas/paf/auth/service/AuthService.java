@@ -59,7 +59,9 @@ public class AuthService {
 				.createdAt(Instant.now())
 				.build();
 
-		return toResponse(userRepository.save(user));
+		@SuppressWarnings("null")
+		AuthUserResponse result = toResponse(userRepository.save(user));
+		return result;
 	}
 
 	public AuthUserResponse login(LoginRequest request) {
@@ -110,14 +112,23 @@ public class AuthService {
 		return toResponse(userRepository.save(user));
 	}
 
+	@SuppressWarnings("null")
 	public void deleteCurrentUser() {
-		userRepository.delete(getCurrentUserDocument());
+		@SuppressWarnings("null")
+		UserDocument user = getCurrentUserDocument();
+		{
+			@SuppressWarnings("null")
+			UserDocument toDelete = user;
+			userRepository.delete(toDelete);
+		}
 	}
 
 	private UserDocument getCurrentUserDocument() {
 		String userId = accessGuard.currentUser().userId();
-		return userRepository.findById(userId)
-				.orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "User profile not found."));
+			@SuppressWarnings("null")
+			UserDocument user = userRepository.findById(userId)
+					.orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "User profile not found."));
+			return user;
 	}
 
 	private AuthUserResponse toResponse(UserDocument user) {
@@ -141,7 +152,9 @@ public class AuthService {
 
 		Optional<UserDocument> existingGoogleUser = userRepository.findByGoogleSubject(googleSubject);
 		if (existingGoogleUser.isPresent()) {
-			return updateGoogleProfile(existingGoogleUser.get(), oauthUser, email, googleSubject);
+				@SuppressWarnings("null")
+				UserDocument updated = updateGoogleProfile(existingGoogleUser.get(), oauthUser, email, googleSubject);
+				return updated;
 		}
 
 		Optional<UserDocument> existingEmailUser = userRepository.findByEmailIgnoreCase(email);
@@ -162,7 +175,9 @@ public class AuthService {
 				.createdAt(Instant.now())
 				.build();
 
-		return userRepository.save(user);
+		@SuppressWarnings("null")
+		UserDocument saved = userRepository.save(user);
+		return saved;
 	}
 
 	private UserDocument updateGoogleProfile(UserDocument user, OAuth2User oauthUser, String email, String googleSubject) {
@@ -171,7 +186,9 @@ public class AuthService {
 		user.setAuthProvider(AuthProvider.GOOGLE);
 		user.setFirstName(resolveFirstName(oauthUser));
 		user.setLastName(resolveLastName(oauthUser));
-		return userRepository.save(user);
+		@SuppressWarnings("null")
+		UserDocument updated = userRepository.save(user);
+		return updated;
 	}
 
 	private UserDocument linkGoogleToExistingUser(UserDocument user, OAuth2User oauthUser, String email, String googleSubject) {

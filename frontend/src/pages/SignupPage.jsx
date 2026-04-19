@@ -87,7 +87,16 @@ export default function SignupPage() {
   }
 
   return (
-    <section className="auth-card auth-card-wide">
+    <div className="auth-shell">
+      <button 
+        type="button" 
+        className="back-button"
+        onClick={() => navigate("/")}
+        aria-label="Go back to home"
+      >
+        ← Back
+      </button>
+      <section className="auth-card auth-card-wide">
       <div className="auth-copy">
         <p className="auth-eyebrow">Student registration</p>
         <h2>Create your Smart Campus account</h2>
@@ -192,6 +201,5 @@ export default function SignupPage() {
       <p className="auth-footer">
         Already have an account? <Link to="/login">Go to login</Link>
       </p>
-    </section>
-  );
+    </section>    </div>  );
 }
