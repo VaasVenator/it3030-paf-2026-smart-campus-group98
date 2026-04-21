@@ -108,7 +108,7 @@ export default function App() {
             className="sidebar-toggle"
             onClick={() => setSidebarOpen((current) => !current)}
           >
-            {sidebarOpen ? "Hide menu" : "Show menu"}
+            {sidebarOpen ? "Hide menu" : "Menu"}
           </button>
 
           <div className="toolbar-actions">
