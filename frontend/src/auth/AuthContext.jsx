@@ -20,30 +20,30 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
-  async function login(credentials) {
+  const login = useCallback(async (credentials) => {
     const signedInUser = await apiPost("/api/auth/login", credentials, null);
     setUser(signedInUser);
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(signedInUser));
     return signedInUser;
-  }
+  }, []);
 
-  async function signup(payload) {
+  const signup = useCallback(async (payload) => {
     const signedUpUser = await apiPost("/api/auth/signup", payload, null);
     setUser(signedUpUser);
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(signedUpUser));
     return signedUpUser;
-  }
+  }, []);
 
-  async function completeGoogleLogin() {
+  const completeGoogleLogin = useCallback(async () => {
     const signedInUser = await apiGet("/api/auth/oauth2/session", null, {
       credentials: "include"
     });
     setUser(signedInUser);
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(signedInUser));
     return signedInUser;
-  }
+  }, []);
 
-  async function logout() {
+  const logout = useCallback(async () => {
     try {
       await apiPost("/api/auth/logout", undefined, null, {
         credentials: "include"
@@ -53,7 +53,7 @@ export function AuthProvider({ children }) {
     }
     setUser(null);
     window.localStorage.removeItem(STORAGE_KEY);
-  }
+  }, []);
 
   const refreshProfile = useCallback(async () => {
     if (!user) {
@@ -96,7 +96,7 @@ export function AuthProvider({ children }) {
       deleteAccount,
       logout
     }),
-    [user, loading, refreshProfile, updateProfile, deleteAccount]
+    [user, loading, login, signup, completeGoogleLogin, refreshProfile, updateProfile, deleteAccount, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

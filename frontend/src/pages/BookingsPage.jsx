@@ -193,12 +193,12 @@ export default function BookingsPage() {
         description="Create booking requests, track approval status, and manage the full booking workflow."
       />
 
-      <div className="booking-layout">
-        {!isAdmin ? (
-          <div className="booking-panel">
-            <h3>{editingBookingId ? "Edit booking request" : "Create booking request"}</h3>
+      <div className="vertical-stack">
+        <div className="booking-panel" style={{ maxWidth: "1200px", margin: "0 auto 2rem" }}>
+          <h3 style={{ marginBottom: "1.5rem", textAlign: "center" }}>{editingBookingId ? "Edit booking request" : "Create booking request"}</h3>
 
-            <form className="booking-form" onSubmit={handleCreateBooking}>
+          <form className="booking-form" onSubmit={handleCreateBooking}>
+            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "1rem" }}>
               <label className="field">
                 <span>Resource</span>
                 <select
@@ -216,94 +216,98 @@ export default function BookingsPage() {
                 </select>
               </label>
 
-              <div className="field-grid two-columns">
-                <label className="field">
-                  <span>Date</span>
-                  <input
-                    type="date"
-                    min={getToday()}
-                    value={form.bookingDate}
-                    onChange={(event) => updateForm("bookingDate", event.target.value)}
-                    required
-                  />
-                </label>
-
-                <label className="field">
-                  <span>Expected attendees</span>
-                  <input
-                    type="number"
-                    min="1"
-                    value={form.expectedAttendees}
-                    onChange={(event) => updateForm("expectedAttendees", event.target.value)}
-                    required
-                  />
-                </label>
-              </div>
-
-              <div className="field-grid two-columns">
-                <label className="field">
-                  <span>Start time</span>
-                  <input
-                    type="time"
-                    value={form.startTime}
-                    onChange={(event) => updateForm("startTime", event.target.value)}
-                    required
-                  />
-                </label>
-
-                <label className="field">
-                  <span>End time</span>
-                  <input
-                    type="time"
-                    value={form.endTime}
-                    onChange={(event) => updateForm("endTime", event.target.value)}
-                    required
-                  />
-                </label>
-              </div>
-
               <label className="field">
-                <span>Purpose</span>
-                <textarea
-                  className="booking-textarea"
-                  value={form.purpose}
-                  onChange={(event) => updateForm("purpose", event.target.value)}
-                  placeholder="Why do you need this resource?"
+                <span>Date</span>
+                <input
+                  type="date"
+                  min={getToday()}
+                  value={form.bookingDate}
+                  onChange={(event) => updateForm("bookingDate", event.target.value)}
                   required
                 />
               </label>
 
-              <div className="action-row">
-                <button type="submit" className="primary-button" disabled={submitting || resourcesLoading}>
-                  {submitting ? "Submitting..." : editingBookingId ? "Update booking" : "Submit booking"}
+              <label className="field">
+                <span>Expected attendees</span>
+                <input
+                  type="number"
+                  min="1"
+                  value={form.expectedAttendees}
+                  onChange={(event) => updateForm("expectedAttendees", event.target.value)}
+                  required
+                />
+              </label>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 2fr auto", gap: "1rem", alignItems: "flex-end" }}>
+              <label className="field">
+                <span>Start time</span>
+                <input
+                  type="time"
+                  value={form.startTime}
+                  onChange={(event) => updateForm("startTime", event.target.value)}
+                  required
+                />
+              </label>
+
+              <label className="field">
+                <span>End time</span>
+                <input
+                  type="time"
+                  value={form.endTime}
+                  onChange={(event) => updateForm("endTime", event.target.value)}
+                  required
+                />
+              </label>
+
+              <label className="field">
+                <span>Purpose</span>
+                <input
+                  className="booking-review-textarea"
+                  style={{ minHeight: "44px", padding: "0.5rem 1rem" }}
+                  value={form.purpose}
+                  onChange={(event) => updateForm("purpose", event.target.value)}
+                  placeholder="Reason for booking"
+                  required
+                />
+              </label>
+
+              <div className="action-row" style={{ marginTop: 0 }}>
+                <button type="submit" className="primary-button" style={{ width: "auto", marginTop: 0, padding: "0.8rem 1.5rem" }} disabled={submitting || resourcesLoading}>
+                  {submitting ? "..." : editingBookingId ? "Update" : "Submit Request"}
                 </button>
                 {editingBookingId ? (
-                  <button type="button" className="secondary-button" onClick={handleCancelEdit}>
-                    Cancel edit
+                  <button type="button" className="secondary-button" style={{ width: "auto", marginTop: 0, padding: "0.8rem 1rem" }} onClick={handleCancelEdit}>
+                    Cancel
                   </button>
                 ) : null}
               </div>
-            </form>
-          </div>
-        ) : null}
+            </div>
+          </form>
+        </div>
 
-        <div className="booking-panel booking-panel-wide">
-          <div className="booking-toolbar">
+        <div className="booking-panel" style={{ maxWidth: "1000px", margin: "0 auto" }}>
+          <div className="booking-toolbar" style={{ flexDirection: "column", alignItems: "center", textAlign: "center", gap: "1.5rem" }}>
             <h3>{isAdmin ? "All booking requests" : "My booking requests"}</h3>
 
-            <label className="field booking-filter">
-              <span>Status filter</span>
-              <select
-                value={statusFilter}
-                onChange={(event) => setStatusFilter(event.target.value)}
-              >
-                <option value="">All</option>
-                <option value="PENDING">Pending</option>
-                <option value="APPROVED">Approved</option>
-                <option value="REJECTED">Rejected</option>
-                <option value="CANCELLED">Cancelled</option>
-              </select>
-            </label>
+            <div className="tab-container" style={{ display: "flex", justifyContent: "center", gap: "1rem", borderBottom: "1px solid var(--border)", width: "100%", paddingBottom: "0.5rem" }}>
+              {[
+                { id: "", label: "All" },
+                { id: "PENDING", label: "Pending" },
+                { id: "APPROVED", label: "Approved" },
+                { id: "CANCELLED", label: "Cancelled" },
+                { id: "REJECTED", label: "Rejected" }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  className={`nav-link ${statusFilter === tab.id ? "nav-link-active" : ""}`}
+                  style={{ background: "none", border: "none", cursor: "pointer", padding: "0.5rem 1rem" }}
+                  onClick={() => setStatusFilter(tab.id)}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {message ? <p className="form-message">{message}</p> : null}
@@ -342,54 +346,65 @@ export default function BookingsPage() {
                 ) : null}
 
                 <div className="booking-actions">
-                  {isAdmin && booking.status === "PENDING" ? (
-                    <>
-                      <textarea
-                        className="booking-textarea"
-                        placeholder="Optional review reason"
-                        value={reviewReason[booking.id] ?? ""}
-                        onChange={(event) =>
-                          setReviewReason((current) => ({
-                            ...current,
-                            [booking.id]: event.target.value
-                          }))
-                        }
-                      />
-
-                      <div className="action-row">
-                        <button
-                          type="button"
-                          className="primary-button"
-                          onClick={() => handleReview(booking.id, "APPROVED")}
-                        >
-                          Approve
-                        </button>
-
-                        <button
-                          type="button"
-                          className="danger-button"
-                          onClick={() => handleReview(booking.id, "REJECTED")}
-                        >
-                          Reject
-                        </button>
+                  <div className="action-row" style={{ alignItems: "flex-end" }}>
+                    {isAdmin && booking.status === "PENDING" ? (
+                      <div className="field" style={{ flex: 1, minWidth: "280px" }}>
+                        <span>Review reason</span>
+                        <textarea
+                          className="booking-review-textarea"
+                          placeholder="Optional review reason"
+                          style={{ minHeight: "60px" }}
+                          value={reviewReason[booking.id] ?? ""}
+                          onChange={(event) =>
+                            setReviewReason((current) => ({
+                              ...current,
+                              [booking.id]: event.target.value
+                            }))
+                          }
+                        />
                       </div>
-                    </>
-                  ) : null}
+                    ) : null}
 
-                  {canCancel(booking.status) ? (
-                    <div className="action-row">
-                      <button
-                        type="button"
-                        className="secondary-button"
-                        onClick={() => handleCancel(booking.id)}
-                      >
-                        Cancel
-                      </button>
+                    <div className="action-row" style={{ marginTop: 0 }}>
+                      {isAdmin && booking.status === "PENDING" ? (
+                        <>
+                          <button
+                            type="button"
+                            className="primary-button"
+                            style={{ width: "auto", marginTop: 0 }}
+                            onClick={() => handleReview(booking.id, "APPROVED")}
+                          >
+                            Approve
+                          </button>
+
+                          <button
+                            type="button"
+                            className="danger-button"
+                            style={{ width: "auto", marginTop: 0 }}
+                            onClick={() => handleReview(booking.id, "REJECTED")}
+                          >
+                            Reject
+                          </button>
+                        </>
+                      ) : null}
+
+                      {canCancel(booking.status) ? (
+                        <button
+                          type="button"
+                          className="secondary-button"
+                          style={{ width: "auto", marginTop: 0 }}
+                          onClick={() => handleCancel(booking.id)}
+                        >
+                          Cancel
+                        </button>
+                      ) : null}
+
                       {!isAdmin && booking.status === "PENDING" ? (
                         <>
                           <button
                             type="button"
                             className="secondary-button"
+                            style={{ width: "auto", marginTop: 0 }}
                             onClick={() => handleEditClick(booking)}
                           >
                             Edit
@@ -397,6 +412,7 @@ export default function BookingsPage() {
                           <button
                             type="button"
                             className="danger-button"
+                            style={{ width: "auto", marginTop: 0 }}
                             onClick={() => handleDeleteBooking(booking.id)}
                           >
                             Delete
@@ -404,7 +420,7 @@ export default function BookingsPage() {
                         </>
                       ) : null}
                     </div>
-                  ) : null}
+                  </div>
                 </div>
               </article>
             ))}

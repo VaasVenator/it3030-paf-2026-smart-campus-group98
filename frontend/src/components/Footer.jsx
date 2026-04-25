@@ -44,11 +44,6 @@ export default function Footer() {
 
       <div className="footer-bottom">
         <p>&copy; {currentYear} Smart Campus Hub. All rights reserved.</p>
-        <div className="footer-links">
-          <a href="#privacy">Privacy Policy</a>
-          <a href="#terms">Terms of Service</a>
-          <a href="#cookies">Cookie Policy</a>
-        </div>
       </div>
     </footer>
   );

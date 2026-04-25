@@ -293,13 +293,19 @@ export default function ResourcesPage() {
             </div>
 
             {isAdmin ? (
-              <div className="resource-card-actions">
-                <button type="button" className="secondary-button" onClick={() => openEditForm(resource)}>
-                  Edit
+              <div className="card-actions-row" style={{ marginTop: "1.5rem", paddingTop: "1rem", borderTop: "1px solid var(--border)", display: "flex", gap: "0.75rem" }}>
+                <button 
+                  type="button" 
+                  className="secondary-button" 
+                  style={{ flex: 1, padding: "0.6rem", fontSize: "0.9rem" }} 
+                  onClick={() => openEditForm(resource)}
+                >
+                  Edit Resource
                 </button>
                 <button
                   type="button"
                   className="danger-button"
+                  style={{ flex: 1, padding: "0.6rem", fontSize: "0.9rem" }}
                   onClick={() => handleDelete(resource.id)}
                 >
                   Delete

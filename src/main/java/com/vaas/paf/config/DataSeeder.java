@@ -23,41 +23,58 @@ public class DataSeeder implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) {
-		if (resourceRepository.count() > 0) {
-			return;
-		}
+		resourceRepository.deleteAll();
 
-		@SuppressWarnings({"null", "unused"})
-		var resources = resourceRepository.saveAll(List.of(
+		resourceRepository.saveAll(List.of(
 				ResourceDocument.builder()
-						.name("Main Lecture Hall A")
+						.name("SLIIT Auditorium")
 						.type(ResourceType.LECTURE_HALL)
-						.capacity(120)
-						.location("Faculty Building A")
+						.capacity(1000)
+						.location("Main Building, Ground Floor")
 						.availabilityStart(LocalTime.of(8, 0))
-						.availabilityEnd(LocalTime.of(18, 0))
+						.availabilityEnd(LocalTime.of(22, 0))
 						.status(ResourceStatus.ACTIVE)
-						.amenities(List.of("Projector", "Air Conditioning", "PA System"))
+						.amenities(List.of("PA System", "Stage Lighting", "Projector", "Air Conditioning"))
 						.build(),
 				ResourceDocument.builder()
-						.name("Networking Lab 02")
-						.type(ResourceType.LAB)
-						.capacity(35)
-						.location("Lab Complex, Floor 2")
-						.availabilityStart(LocalTime.of(9, 0))
-						.availabilityEnd(LocalTime.of(17, 0))
+						.name("SLIIT Islands")
+						.type(ResourceType.MEETING_ROOM)
+						.capacity(20)
+						.location("Student Center")
+						.availabilityStart(LocalTime.of(7, 0))
+						.availabilityEnd(LocalTime.of(19, 0))
 						.status(ResourceStatus.ACTIVE)
-						.amenities(List.of("PCs", "Switch Rack", "Smart Board"))
+						.amenities(List.of("Open Air", "Whiteboard", "WiFi"))
 						.build(),
 				ResourceDocument.builder()
-						.name("Portable Camera Kit")
-						.type(ResourceType.EQUIPMENT)
-						.capacity(1)
-						.location("Media Unit")
+						.name("Bird Nest")
+						.type(ResourceType.MEETING_ROOM)
+						.capacity(10)
+						.location("Library, 3rd Floor")
 						.availabilityStart(LocalTime.of(8, 30))
-						.availabilityEnd(LocalTime.of(16, 30))
+						.availabilityEnd(LocalTime.of(17, 30))
 						.status(ResourceStatus.ACTIVE)
-						.amenities(List.of("Tripod", "Battery Pack"))
+						.amenities(List.of("Glass Walls", "Smart TV", "Charging Ports"))
+						.build(),
+				ResourceDocument.builder()
+						.name("New Building 14th Floor Main Hall")
+						.type(ResourceType.LECTURE_HALL)
+						.capacity(500)
+						.location("New Building")
+						.availabilityStart(LocalTime.of(8, 0))
+						.availabilityEnd(LocalTime.of(20, 0))
+						.status(ResourceStatus.ACTIVE)
+						.amenities(List.of("Panoramic View", "Modern PA System", "High Speed WiFi"))
+						.build(),
+				ResourceDocument.builder()
+						.name("SLIIT Grounds")
+						.type(ResourceType.EQUIPMENT) // Or maybe a new type? I'll use EQUIPMENT for now as a generic facility
+						.capacity(2000)
+						.location("Campus Perimeter")
+						.availabilityStart(LocalTime.of(6, 0))
+						.availabilityEnd(LocalTime.of(18, 30))
+						.status(ResourceStatus.ACTIVE)
+						.amenities(List.of("Bleachers", "Changing Rooms", "Floodlights"))
 						.build()));
 	}
 }
