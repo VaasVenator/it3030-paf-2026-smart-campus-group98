@@ -109,7 +109,8 @@ export default function SignupPage() {
           flexDirection: "row",
           padding: 0, 
           overflow: "hidden", 
-          maxWidth: "960px", 
+          width: "100%",
+          maxWidth: "1200px", 
           zIndex: 1, 
           border: "1px solid rgba(255,255,255,0.08)",
           boxShadow: "0 24px 48px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset"

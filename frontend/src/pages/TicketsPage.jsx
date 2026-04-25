@@ -780,34 +780,35 @@ export default function TicketsPage() {
 
             {commentsLoading ? <p className="state-text">Loading comments...</p> : null}
 
-            <div className="stack-list">
+            <div className="comment-list">
               {comments.map((comment) => (
-                <article key={comment.id} className="stack-card">
-                  <div className="stack-head">
-                    <div>
-                      <h3>{comment.authorName}</h3>
-                      <p>{comment.authorRole}</p>
-                    </div>
-                    <span className="tag">
+                <article key={comment.id} className="comment-item">
+                  <div className="comment-header">
+                    <span className="comment-user">
+                      {comment.authorName} <span style={{ fontWeight: 400, opacity: 0.6 }}>({comment.authorRole})</span>
+                    </span>
+                    <span className="comment-date">
                       {new Date(comment.updatedAt).toLocaleString()}
                     </span>
                   </div>
 
                   {editingCommentId === comment.id ? (
-                    <>
+                    <div style={{ marginTop: "1rem" }}>
                       <textarea
-                        className="booking-textarea"
+                        className="booking-review-textarea"
                         value={editingCommentMessage}
                         onChange={(event) => setEditingCommentMessage(event.target.value)}
+                        autoFocus
                       />
-                      <div className="resource-card-actions">
+                      <div className="comment-actions">
                         <button
                           type="button"
-                          className="primary-button profile-action-button"
+                          className="primary-button"
+                          style={{ width: "auto", margin: 0 }}
                           onClick={() => handleUpdateComment(comment.id)}
                           disabled={commentBusy}
                         >
-                          Save comment
+                          Save Changes
                         </button>
                         <button
                           type="button"
@@ -820,38 +821,38 @@ export default function TicketsPage() {
                           Cancel
                         </button>
                       </div>
-                    </>
+                    </div>
                   ) : (
                     <>
-                      <p className="stack-copy">{comment.message}</p>
-                      {canEditComment(comment) ? (
-                        <div className="resource-card-actions">
-                          <button
-                            type="button"
-                            className="secondary-button"
+                      <div className="comment-body">{comment.message}</div>
+                      {canEditComment(comment) && (
+                        <div className="comment-actions">
+                          <span 
+                            className="comment-action-link"
                             onClick={() => {
                               setEditingCommentId(comment.id);
                               setEditingCommentMessage(comment.message);
                             }}
                           >
                             Edit
-                          </button>
-                          <button
-                            type="button"
-                            className="danger-button"
+                          </span>
+                          <span 
+                            className="comment-action-link comment-action-link-danger"
                             onClick={() => handleDeleteComment(comment.id)}
                           >
                             Delete
-                          </button>
+                          </span>
                         </div>
-                      ) : null}
+                      )}
                     </>
                   )}
                 </article>
               ))}
 
               {!commentsLoading && comments.length === 0 ? (
-                <p className="state-text">No comments yet for this ticket.</p>
+                <div style={{ textAlign: "center", padding: "2rem", opacity: 0.6 }}>
+                  No messages yet. Start the conversation!
+                </div>
               ) : null}
             </div>
           </div>

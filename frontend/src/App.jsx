@@ -6,7 +6,7 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const ResourcesPage = lazy(() => import("./pages/ResourcesPage"));
 const BookingsPage = lazy(() => import("./pages/BookingsPage"));
-const AdminBookingsPage = lazy(() => import("./pages/AdminBookingsPage"));
+const AdminDashboardPage = lazy(() => import("./pages/AdminDashboardPage"));
 const TicketsPage = lazy(() => import("./pages/TicketsPage"));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
@@ -46,10 +46,10 @@ export default function App() {
     { to: "/dashboard", label: "Overview" },
     { to: "/resources", label: "Resources" },
     { to: "/bookings", label: "Bookings" },
-    { to: "/tickets", label: "Tickets" },
+    { to: "/tickets", label: "Jobs" },
     { to: "/notifications", label: "Notifications" },
     ...(user?.role === "ADMIN"
-      ? [{ to: "/admin/bookings", label: "Admin Bookings" }]
+      ? [{ to: "/admin/dashboard", label: "Admin Dashboard" }]
       : [])
   ];
 
@@ -173,10 +173,10 @@ export default function App() {
               }
             />
             <Route
-              path="/admin/bookings"
+              path="/admin/dashboard"
               element={
                 <ProtectedRoute>
-                  <AdminBookingsPage />
+                  <AdminDashboardPage />
                 </ProtectedRoute>
               }
             />
