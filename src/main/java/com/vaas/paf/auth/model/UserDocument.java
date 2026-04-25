@@ -37,4 +37,6 @@ public class UserDocument {
 	private String passwordHash;
 	private UserRole role;
 	private Instant createdAt;
+	private String resetCode;
+	private Instant resetCodeExpiry;
 }

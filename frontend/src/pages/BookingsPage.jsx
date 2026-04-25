@@ -145,7 +145,7 @@ export default function BookingsPage() {
         description="Create booking requests, track approval status, and manage the full booking workflow."
       />
 
-      <div className="booking-layout">
+      <div className={`booking-layout ${isAdmin ? "booking-layout-fullwidth" : ""}`}>
         {!isAdmin ? (
           <div className="booking-panel">
             <h3>Create booking request</h3>
@@ -254,85 +254,87 @@ export default function BookingsPage() {
           {loading && <p className="state-text">Loading bookings...</p>}
           {error && <p className="state-text state-error">{error}</p>}
 
-          <div className="stack-list">
-            {bookings.length === 0 && !loading ? (
-              <p className="state-text">No bookings found.</p>
-            ) : null}
+          {bookings.length === 0 && !loading ? (
+            <p className="state-text">No bookings found.</p>
+          ) : null}
 
-            {bookings.map((booking) => (
-              <article key={booking.id} className="stack-card booking-card">
-                <div className="stack-head">
-                  <div>
-                    <h3>{booking.resourceName}</h3>
-                    <p>
-                      {booking.bookingDate} | {booking.startTime} - {booking.endTime}
-                    </p>
-                  </div>
-                  <StatusBadge value={booking.status} />
-                </div>
+          {bookings.length > 0 && (
+            <div className="bookings-table-wrapper">
+              <table className="bookings-table">
+                <thead>
+                  <tr>
+                    <th>Resource</th>
+                    <th>Date & Time</th>
+                    <th>Purpose</th>
+                    <th>Attendees</th>
+                    <th>Requester</th>
+                    <th>Reviewed By</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bookings.map((booking) => (
+                    <tr key={booking.id} className="booking-row">
+                      <td>{booking.resourceName}</td>
+                      <td>{booking.bookingDate} {booking.startTime} - {booking.endTime}</td>
+                      <td>{booking.purpose}</td>
+                      <td>{booking.expectedAttendees}</td>
+                      <td>{booking.requesterName}</td>
+                      <td>{booking.reviewedBy ?? "Not reviewed"}</td>
+                      <td>{booking.decisionReason ?? "-"}</td>
+                      <td><StatusBadge value={booking.status} /></td>
+                      <td className="booking-actions-cell">
+                        {isAdmin && booking.status === "PENDING" ? (
+                          <div className="booking-controls">
+                            <textarea
+                              className="booking-textarea-inline"
+                              placeholder="Optional reason"
+                              value={reviewReason[booking.id] ?? ""}
+                              onChange={(event) =>
+                                setReviewReason((current) => ({
+                                  ...current,
+                                  [booking.id]: event.target.value
+                                }))
+                              }
+                            />
+                            <div className="booking-button-group">
+                              <button
+                                type="button"
+                                className="primary-button"
+                                onClick={() => handleReview(booking.id, "APPROVED")}
+                              >
+                                Approve
+                              </button>
 
-                <p className="stack-copy">{booking.purpose}</p>
+                              <button
+                                type="button"
+                                className="danger-button"
+                                onClick={() => handleReview(booking.id, "REJECTED")}
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          </div>
+                        ) : null}
 
-                <div className="stack-meta">
-                  <span>Requester: {booking.requesterName}</span>
-                  <span>Attendees: {booking.expectedAttendees}</span>
-                  <span>Reviewed by: {booking.reviewedBy ?? "Not reviewed yet"}</span>
-                </div>
-
-                {booking.decisionReason ? (
-                  <p className="booking-reason">
-                    <strong>Reason:</strong> {booking.decisionReason}
-                  </p>
-                ) : null}
-
-                <div className="booking-actions">
-                  {isAdmin && booking.status === "PENDING" ? (
-                    <>
-                      <textarea
-                        className="booking-textarea"
-                        placeholder="Optional review reason"
-                        value={reviewReason[booking.id] ?? ""}
-                        onChange={(event) =>
-                          setReviewReason((current) => ({
-                            ...current,
-                            [booking.id]: event.target.value
-                          }))
-                        }
-                      />
-
-                      <div className="action-row">
-                        <button
-                          type="button"
-                          className="primary-button"
-                          onClick={() => handleReview(booking.id, "APPROVED")}
-                        >
-                          Approve
-                        </button>
-
-                        <button
-                          type="button"
-                          className="danger-button"
-                          onClick={() => handleReview(booking.id, "REJECTED")}
-                        >
-                          Reject
-                        </button>
-                      </div>
-                    </>
-                  ) : null}
-
-                  {canCancel(booking.status) ? (
-                    <button
-                      type="button"
-                      className="secondary-button"
-                      onClick={() => handleCancel(booking.id)}
-                    >
-                      Cancel booking
-                    </button>
-                  ) : null}
-                </div>
-              </article>
-            ))}
-          </div>
+                        {canCancel(booking.status) ? (
+                          <button
+                            type="button"
+                            className="secondary-button"
+                            onClick={() => handleCancel(booking.id)}
+                          >
+                            Cancel
+                          </button>
+                        ) : null}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </section>

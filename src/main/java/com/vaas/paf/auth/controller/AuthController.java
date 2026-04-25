@@ -16,6 +16,8 @@ import com.vaas.paf.auth.dto.AuthUserResponse;
 import com.vaas.paf.auth.dto.LoginRequest;
 import com.vaas.paf.auth.dto.SignupRequest;
 import com.vaas.paf.auth.dto.UpdateProfileRequest;
+import com.vaas.paf.auth.dto.ForgotPasswordRequest;
+import com.vaas.paf.auth.dto.ResetPasswordRequest;
 import com.vaas.paf.auth.service.AuthService;
 
 import jakarta.validation.Valid;
@@ -71,5 +73,15 @@ public class AuthController {
 			session.invalidate();
 		}
 		SecurityContextHolder.clearContext();
+	}
+
+	@PostMapping("/forgot-password")
+	public void forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+		authService.sendPasswordResetCode(request.getStudentId(), request.getEmail());
+	}
+
+	@PostMapping("/reset-password")
+	public void resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+		authService.resetPassword(request.getStudentId(), request.getEmail(), request.getResetCode(), request.getNewPassword());
 	}
 }

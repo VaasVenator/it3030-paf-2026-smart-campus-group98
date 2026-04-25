@@ -142,6 +142,52 @@ public class AuthService {
 		}
 	}
 
+	public void sendPasswordResetCode(String studentId, String email) {
+		String normalizedId = studentId.trim().toUpperCase();
+		UserDocument user = userRepository.findByStudentIdIgnoreCase(normalizedId)
+				.orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "User with this student ID not found."));
+
+		if (!user.getEmail().equalsIgnoreCase(email.trim())) {
+			throw new AppException(HttpStatus.BAD_REQUEST, "Email does not match the account email.");
+		}
+
+		// Generate a random 6-digit code
+		String resetCode = String.format("%06d", (int)(Math.random() * 1000000));
+		long expiryTime = System.currentTimeMillis() + (15 * 60 * 1000); // 15 minutes
+
+		user.setResetCode(resetCode);
+		user.setResetCodeExpiry(Instant.ofEpochMilli(expiryTime));
+		userRepository.save(user);
+
+		// TODO: Send email with reset code
+		// For now, log it (in production, send via email service)
+		System.out.println("Password reset code for " + studentId + ": " + resetCode);
+	}
+
+	public void resetPassword(String studentId, String email, String resetCode, String newPassword) {
+		String normalizedId = studentId.trim().toUpperCase();
+		UserDocument user = userRepository.findByStudentIdIgnoreCase(normalizedId)
+				.orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "User with this student ID not found."));
+
+		if (!user.getEmail().equalsIgnoreCase(email.trim())) {
+			throw new AppException(HttpStatus.BAD_REQUEST, "Email does not match the account email.");
+		}
+
+		if (user.getResetCode() == null || !user.getResetCode().equals(resetCode.trim())) {
+			throw new AppException(HttpStatus.BAD_REQUEST, "Invalid reset code.");
+		}
+
+		if (user.getResetCodeExpiry() == null || System.currentTimeMillis() > user.getResetCodeExpiry().toEpochMilli()) {
+			throw new AppException(HttpStatus.BAD_REQUEST, "Reset code has expired. Please request a new one.");
+		}
+
+		// Update password and clear reset code
+		user.setPasswordHash(passwordEncoder.encode(newPassword));
+		user.setResetCode(null);
+		user.setResetCodeExpiry(null);
+		userRepository.save(user);
+	}
+
 	private UserDocument getCurrentUserDocument() {
 		String userId = accessGuard.currentUser().userId();
 			@SuppressWarnings("null")

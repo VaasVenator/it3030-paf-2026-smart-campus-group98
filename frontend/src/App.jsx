@@ -10,6 +10,7 @@ import TicketsPage from "./pages/TicketsPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import PasswordResetPage from "./pages/PasswordResetPage";
 import ProfilePage from "./pages/ProfilePage";
 import OAuthSuccessPage from "./pages/OAuthSuccessPage";
 import HomePage from "./pages/HomePage";
@@ -39,6 +40,7 @@ export default function App() {
   const isAuthPage =
     location.pathname === "/login" ||
     location.pathname === "/signup" ||
+    location.pathname === "/reset-password" ||
     location.pathname === "/oauth-success";
 
   const isPublicPage = 
@@ -55,6 +57,7 @@ export default function App() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/reset-password" element={<PasswordResetPage />} />
         <Route path="/oauth-success" element={<OAuthSuccessPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

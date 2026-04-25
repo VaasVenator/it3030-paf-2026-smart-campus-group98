@@ -88,6 +88,9 @@ export default function LoginPage() {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />
+          <Link to="/reset-password" className="forgot-password-link">
+            Forgot password?
+          </Link>
         </label>
 
         <button type="submit" className="primary-button">

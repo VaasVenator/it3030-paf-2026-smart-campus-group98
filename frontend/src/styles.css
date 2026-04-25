@@ -424,6 +424,20 @@ code {
   color: #ffd069;
 }
 
+.forgot-password-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #f0a85e;
+  text-decoration: none;
+  transition: color 180ms ease;
+}
+
+.forgot-password-link:hover {
+  color: #ffd069;
+  text-decoration: underline;
+}
+
 .form-message {
   margin: 0.8rem 0 0;
 }
@@ -778,6 +792,10 @@ code {
   align-items: start;
 }
 
+.booking-layout-fullwidth {
+  grid-template-columns: 1fr;
+}
+
 .booking-panel {
   padding: 1.2rem;
   border-radius: 24px;
@@ -851,6 +869,95 @@ code {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
+}
+
+/* Bookings Table Styles */
+.bookings-table-wrapper {
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  margin-top: 1.5rem;
+}
+
+.bookings-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.95rem;
+}
+
+.bookings-table thead {
+  background: rgba(240, 168, 94, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.bookings-table th {
+  padding: 1rem;
+  text-align: left;
+  color: #f0a85e;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
+}
+
+.bookings-table td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #f8f3e8;
+}
+
+.bookings-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.booking-row {
+  transition: background 180ms ease;
+}
+
+.booking-actions-cell {
+  min-width: 280px;
+}
+
+.booking-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.booking-textarea-inline {
+  width: 100%;
+  min-height: 60px;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #f8f3e8;
+  font-size: 0.9rem;
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+  transition: border-color 180ms ease, background 180ms ease;
+}
+
+.booking-textarea-inline:focus {
+  border-color: rgba(240, 168, 94, 0.7);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.booking-button-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.booking-button-group button {
+  flex: 1;
+  min-width: 70px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.9rem;
 }
 
 @media (max-width: 980px) {
@@ -1696,6 +1803,19 @@ code {
   .features-grid {
     grid-template-columns: 1fr;
   }
+
+  .bookings-table {
+    font-size: 0.85rem;
+  }
+
+  .bookings-table th,
+  .bookings-table td {
+    padding: 0.75rem;
+  }
+
+  .booking-actions-cell {
+    min-width: 250px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1714,6 +1834,27 @@ code {
   .footer-container {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+  }
+
+  .bookings-table {
+    font-size: 0.8rem;
+  }
+
+  .bookings-table th,
+  .bookings-table td {
+    padding: 0.5rem;
+  }
+
+  .booking-actions-cell {
+    min-width: 280px;
+  }
+
+  .booking-button-group {
+    flex-direction: column;
+  }
+
+  .booking-button-group button {
+    width: 100%;
   }
 }
 
