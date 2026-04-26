@@ -28,8 +28,12 @@ public class RequestUserFilter extends OncePerRequestFilter {
 		String roleValue = request.getHeader("X-User-Role");
 
 		if (userId != null && !userId.isBlank() && userName != null && !userName.isBlank() && roleValue != null && !roleValue.isBlank()) {
-			UserRole role = UserRole.valueOf(roleValue.toUpperCase());
-			RequestUserContext.setCurrentUser(new AuthenticatedUser(userId, userName, role));
+			try {
+				UserRole role = UserRole.valueOf(roleValue.toUpperCase());
+				RequestUserContext.setCurrentUser(new AuthenticatedUser(userId, userName, role));
+			} catch (IllegalArgumentException exception) {
+				// Invalid role value in header, fall through to use default user
+			}
 		}
 
 		try {

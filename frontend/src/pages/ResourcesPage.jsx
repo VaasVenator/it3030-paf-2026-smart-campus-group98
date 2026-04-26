@@ -5,7 +5,7 @@ import ResourceForm from "../components/ResourceForm";
 import StatusBadge from "../components/StatusBadge";
 import { apiDelete, apiGet, apiPost, apiPut } from "../lib/api";
 
-const typeOptions = ["", "LECTURE_HALL", "LAB", "MEETING_ROOM", "EQUIPMENT"];
+const typeOptions = ["", "LECTURE_HALL", "LAB", "MEETING_ROOM", "EQUIPMENT", "OPEN_AREA"];
 const statusOptions = ["", "ACTIVE", "OUT_OF_SERVICE"];
 
 function buildQuery(filters, page, size) {

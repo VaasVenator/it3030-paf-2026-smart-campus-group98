@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-const resourceTypes = ["LECTURE_HALL", "LAB", "MEETING_ROOM", "EQUIPMENT"];
+const resourceTypes = ["LECTURE_HALL", "LAB", "MEETING_ROOM", "EQUIPMENT", "OPEN_AREA"];
 const resourceStatuses = ["ACTIVE", "OUT_OF_SERVICE"];
 
 function buildInitialForm(initialData) {
