@@ -27,8 +27,15 @@ export default function Header() {
           <Link to="/contact" className="header-nav-link">Contact Us</Link>
           
           {user ? (
-            <div className="header-user-menu">
+            <div className="header-user-menu" style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
               <Link to="/dashboard" className="header-nav-link">Dashboard</Link>
+              <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "var(--accent-bg-strong)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.8rem", fontWeight: 700, color: "var(--accent-strong)", border: "1px solid var(--border-strong)", overflow: "hidden" }}>
+                {user.profilePictureUrl ? (
+                  <img src={user.profilePictureUrl} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                ) : (
+                  user.firstName?.[0] ?? "U"
+                )}
+              </div>
               <span className="header-user-name">{user.displayName}</span>
               <button onClick={handleLogout} className="header-logout-btn">
                 Logout

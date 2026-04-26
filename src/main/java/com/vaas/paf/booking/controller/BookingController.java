@@ -1,3 +1,6 @@
+/**
+ * Implementation by Member 2: Booking workflow + conflict checking.
+ */
 package com.vaas.paf.booking.controller;
 
 import java.util.List;

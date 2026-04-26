@@ -10,7 +10,8 @@ const initialForm = {
   firstName: "",
   lastName: "",
   password: "",
-  confirmPassword: ""
+  confirmPassword: "",
+  profilePictureUrl: ""
 };
 
 export default function SignupPage() {
@@ -58,6 +59,25 @@ export default function SignupPage() {
       [name]: value
     }));
   }
+ 
+  function handleFileChange(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+ 
+    if (file.size > 1024 * 1024) {
+      alert("Image must be smaller than 1MB");
+      return;
+    }
+ 
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setForm((current) => ({
+        ...current,
+        profilePictureUrl: reader.result
+      }));
+    };
+    reader.readAsDataURL(file);
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -76,7 +96,8 @@ export default function SignupPage() {
         firstName: form.firstName.trim(),
         lastName: form.lastName.trim(),
         password: form.password,
-        confirmPassword: form.confirmPassword
+        confirmPassword: form.confirmPassword,
+        profilePictureUrl: form.profilePictureUrl.trim()
       });
       navigate("/", { replace: true });
     } catch (errorResponse) {
@@ -92,8 +113,8 @@ export default function SignupPage() {
       <div style={{ position: "absolute", top: "-10%", right: "-5%", width: "50vw", height: "50vw", background: "radial-gradient(circle, rgba(45,212,191,0.12) 0%, transparent 60%)", borderRadius: "50%", zIndex: 0 }}></div>
       <div style={{ position: "absolute", bottom: "-20%", left: "-10%", width: "60vw", height: "60vw", background: "radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 60%)", borderRadius: "50%", zIndex: 0 }}></div>
 
-      <button 
-        type="button" 
+      <button
+        type="button"
         className="back-button"
         onClick={() => navigate("/")}
         aria-label="Go back to home"
@@ -102,16 +123,16 @@ export default function SignupPage() {
         ← Back
       </button>
 
-      <section 
-        className="auth-card auth-card-wide" 
-        style={{ 
-          display: "flex", 
+      <section
+        className="auth-card auth-card-wide"
+        style={{
+          display: "flex",
           flexDirection: "row",
-          padding: 0, 
-          overflow: "hidden", 
+          padding: 0,
+          overflow: "hidden",
           width: "100%",
-          maxWidth: "1200px", 
-          zIndex: 1, 
+          maxWidth: "1200px",
+          zIndex: 1,
           border: "1px solid rgba(255,255,255,0.08)",
           boxShadow: "0 24px 48px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset"
         }}
@@ -218,6 +239,29 @@ export default function SignupPage() {
                   <small className="field-error">{errors.confirmPassword}</small>
                 ) : null}
               </label>
+ 
+              <label className="field" style={{ gridColumn: "span 2" }}>
+                <span>Profile picture</span>
+                <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    style={{ 
+                      flex: 1,
+                      padding: "0.5rem", 
+                      border: "1px dashed var(--border)", 
+                      borderRadius: "var(--radius)",
+                      cursor: "pointer"
+                    }}
+                  />
+                  {form.profilePictureUrl && (
+                    <div style={{ width: "56px", height: "56px", borderRadius: "50%", overflow: "hidden", border: "2px solid var(--accent-strong)", boxShadow: "0 0 10px rgba(0,0,0,0.2)" }}>
+                      <img src={form.profilePictureUrl} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    </div>
+                  )}
+                </div>
+              </label>
             </div>
 
             <button type="submit" className="primary-button" style={{ marginTop: "1.5rem" }}>
@@ -232,27 +276,27 @@ export default function SignupPage() {
         </div>
 
         {/* Right Side - Premium Promo Panel */}
-        <div 
+        <div
           className="promo-side"
-          style={{ 
-            flex: "1 1 40%", 
-            background: "linear-gradient(145deg, rgba(20, 28, 41, 0.9), rgba(10, 15, 23, 0.95))", 
-            borderLeft: "1px solid rgba(255,255,255,0.05)", 
-            padding: "3.5rem 2.5rem", 
-            display: "flex", 
-            flexDirection: "column", 
-            justifyContent: "center", 
-            position: "relative", 
-            overflow: "hidden" 
+          style={{
+            flex: "1 1 40%",
+            background: "linear-gradient(145deg, rgba(20, 28, 41, 0.9), rgba(10, 15, 23, 0.95))",
+            borderLeft: "1px solid rgba(255,255,255,0.05)",
+            padding: "3.5rem 2.5rem",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            position: "relative",
+            overflow: "hidden"
           }}
         >
           {/* Top Edge Highlight */}
           <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: "linear-gradient(90deg, var(--accent-strong), var(--accent-deep))" }}></div>
-          
+
           {/* Subtle Graphic */}
           <div style={{ width: "64px", height: "64px", borderRadius: "16px", background: "var(--accent-bg-strong)", border: "1px solid var(--border-strong)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "2rem" }}>
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent-strong)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
             </svg>
           </div>
 

@@ -84,7 +84,16 @@ public class TicketService {
 		ticket.setAssignedTechnicianId(request.technicianId());
 		ticket.setAssignedTechnicianName(request.technicianName());
 		ticket.setUpdatedAt(Instant.now());
-		return toResponse(ticketRepository.save(ticket));
+		TicketDocument saved = ticketRepository.save(ticket);
+		
+		notificationService.createForUser(
+				saved.getAssignedTechnicianId(),
+				"New Ticket Assigned",
+				"You have been assigned to a maintenance ticket at %s.".formatted(saved.getLocation()),
+				NotificationType.TICKET_STATUS_CHANGED, // Reusing status type for simplicity
+				saved.getId());
+				
+		return toResponse(saved);
 	}
 
 	public TicketResponse updateStatus(String ticketId, UpdateTicketStatusRequest request) {

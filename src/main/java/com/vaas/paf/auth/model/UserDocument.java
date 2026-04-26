@@ -23,7 +23,7 @@ public class UserDocument {
 	@Id
 	private String id;
 
-	@Indexed(unique = true)
+	@Indexed(unique = true, sparse = true)
 	private String studentId;
 
 	@Indexed(unique = true)
@@ -36,5 +36,6 @@ public class UserDocument {
 	private String lastName;
 	private String passwordHash;
 	private UserRole role;
+	private String profilePictureUrl;
 	private Instant createdAt;
 }

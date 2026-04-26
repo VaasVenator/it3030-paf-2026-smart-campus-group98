@@ -137,8 +137,12 @@ export default function App() {
           </button>
 
           <div className="toolbar-actions">
-            <Link to="/profile" className="profile-icon-button" aria-label="Open profile page">
-              <span>{user?.firstName?.[0] ?? "U"}</span>
+            <Link to="/profile" className="profile-icon-button" aria-label="Open profile page" style={{ padding: 0, overflow: "hidden" }}>
+              {user.profilePictureUrl ? (
+                <img src={user.profilePictureUrl} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              ) : (
+                <span>{user?.firstName?.[0] ?? "U"}</span>
+              )}
             </Link>
             <button type="button" className="logout-button toolbar-logout" onClick={logout}>
               Log out

@@ -38,7 +38,7 @@ public class DataSeeder implements ApplicationRunner {
 						.build(),
 				ResourceDocument.builder()
 						.name("SLIIT Islands")
-						.type(ResourceType.MEETING_ROOM)
+						.type(ResourceType.OPEN_AREA)
 						.capacity(20)
 						.location("Student Center")
 						.availabilityStart(LocalTime.of(7, 0))
@@ -48,7 +48,7 @@ public class DataSeeder implements ApplicationRunner {
 						.build(),
 				ResourceDocument.builder()
 						.name("Bird Nest")
-						.type(ResourceType.MEETING_ROOM)
+						.type(ResourceType.OPEN_AREA)
 						.capacity(10)
 						.location("Library, 3rd Floor")
 						.availabilityStart(LocalTime.of(8, 30))
@@ -68,7 +68,7 @@ public class DataSeeder implements ApplicationRunner {
 						.build(),
 				ResourceDocument.builder()
 						.name("SLIIT Grounds")
-						.type(ResourceType.EQUIPMENT) // Or maybe a new type? I'll use EQUIPMENT for now as a generic facility
+						.type(ResourceType.OPEN_AREA)
 						.capacity(2000)
 						.location("Campus Perimeter")
 						.availabilityStart(LocalTime.of(6, 0))

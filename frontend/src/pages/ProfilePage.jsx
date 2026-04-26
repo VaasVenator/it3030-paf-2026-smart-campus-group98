@@ -13,6 +13,7 @@ export default function ProfilePage() {
     username: "",
     firstName: "",
     lastName: "",
+    profilePictureUrl: "",
     ...emptyPasswords
   });
   const [editing, setEditing] = useState(false);
@@ -26,6 +27,7 @@ export default function ProfilePage() {
         username: user.username ?? "",
         firstName: user.firstName ?? "",
         lastName: user.lastName ?? "",
+        profilePictureUrl: user.profilePictureUrl ?? "",
         ...emptyPasswords
       });
     }
@@ -43,6 +45,25 @@ export default function ProfilePage() {
       [name]: value
     }));
   }
+ 
+  function handleFileChange(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+ 
+    if (file.size > 1024 * 1024) {
+      alert("Image must be smaller than 1MB");
+      return;
+    }
+ 
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setForm((current) => ({
+        ...current,
+        profilePictureUrl: reader.result
+      }));
+    };
+    reader.readAsDataURL(file);
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -52,12 +73,12 @@ export default function ProfilePage() {
 
     try {
       await updateProfile(form);
+      setMessage("Profile updated successfully!");
       setEditing(false);
-      setMessage("Profile updated successfully.");
-      setForm((current) => ({
-        ...current,
-        ...emptyPasswords
-      }));
+      // Wait a moment for the toast then refresh to ensure all UI components sync
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -78,12 +99,16 @@ export default function ProfilePage() {
 
   return (
     <section>
-      <PageHeader title="Profile" description="View and manage your user details." />
+      <PageHeader title="Profile" description="View and manage your user details." centered />
 
       <div className="profile-card">
         <div className="profile-hero">
-          <button type="button" className="profile-avatar" aria-label="Profile avatar">
-            {user?.firstName?.[0] ?? "U"}
+          <button type="button" className="profile-avatar" aria-label="Profile avatar" style={{ padding: 0, overflow: "hidden" }}>
+            {user?.profilePictureUrl ? (
+              <img src={user.profilePictureUrl} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              user?.firstName?.[0] ?? "U"
+            )}
           </button>
           <div className="profile-identity">
             <h3>{user?.displayName}</h3>
@@ -160,6 +185,31 @@ export default function ProfilePage() {
                 placeholder="Repeat new password"
               />
             </label>
+ 
+            <label className="field">
+              <span>Profile picture</span>
+              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  disabled={!editing}
+                  style={{ 
+                    flex: 1,
+                    padding: "0.4rem", 
+                    border: "1px dashed var(--border)", 
+                    borderRadius: "var(--radius)",
+                    cursor: editing ? "pointer" : "default",
+                    fontSize: "0.85rem"
+                  }}
+                />
+                {form.profilePictureUrl && (
+                  <div style={{ width: "44px", height: "44px", borderRadius: "50%", overflow: "hidden", border: "1px solid var(--border)" }}>
+                    <img src={form.profilePictureUrl} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  </div>
+                )}
+              </div>
+            </label>
           </div>
 
           <div className="profile-actions">
@@ -179,6 +229,7 @@ export default function ProfilePage() {
                       username: user?.username ?? "",
                       firstName: user?.firstName ?? "",
                       lastName: user?.lastName ?? "",
+                      profilePictureUrl: user?.profilePictureUrl ?? "",
                       ...emptyPasswords
                     });
                   }}

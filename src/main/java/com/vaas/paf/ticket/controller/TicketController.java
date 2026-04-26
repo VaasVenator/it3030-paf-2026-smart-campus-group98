@@ -1,3 +1,6 @@
+/**
+ * Implementation by Member 3: Incident tickets + attachments + technician updates.
+ */
 package com.vaas.paf.ticket.controller;
 
 import java.util.List;

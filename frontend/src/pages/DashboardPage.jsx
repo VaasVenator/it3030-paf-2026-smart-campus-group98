@@ -31,7 +31,6 @@ export default function DashboardPage() {
   return (
     <section className="dashboard-view">
       <PageHeader
-        eyebrow="Overview"
         title={`Welcome back, ${user?.firstName || "User"}`}
         description="Monitor your campus resources, check ticket status, and stay updated with recent activity."
       />

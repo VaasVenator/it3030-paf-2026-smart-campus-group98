@@ -56,6 +56,7 @@ public class AuthService {
 				.lastName(request.lastName().trim())
 				.passwordHash(passwordEncoder.encode(request.password()))
 				.role(UserRole.USER)
+				.profilePictureUrl(request.profilePictureUrl())
 				.createdAt(Instant.now())
 				.build();
 
@@ -98,7 +99,8 @@ public class AuthService {
 		UserDocument user = getCurrentUserDocument();
 		String requestedUsername = request.username().trim();
 
-		if (!user.getUsername().equalsIgnoreCase(requestedUsername)
+		if (requestedUsername != null && !requestedUsername.isBlank() 
+				&& !user.getUsername().equalsIgnoreCase(requestedUsername)
 				&& userRepository.existsByUsernameIgnoreCase(requestedUsername)) {
 			throw new AppException(HttpStatus.CONFLICT, "That username is already taken.");
 		}
@@ -106,10 +108,14 @@ public class AuthService {
 		user.setUsername(requestedUsername);
 		user.setFirstName(request.firstName().trim());
 		user.setLastName(request.lastName().trim());
+		user.setProfilePictureUrl(request.profilePictureUrl());
 
-		String newPassword = request.newPassword() == null ? "" : request.newPassword().trim();
-		String confirmNewPassword = request.confirmNewPassword() == null ? "" : request.confirmNewPassword().trim();
+		String newPassword = (request.newPassword() == null) ? "" : request.newPassword().trim();
+		String confirmNewPassword = (request.confirmNewPassword() == null) ? "" : request.confirmNewPassword().trim();
 		if (!newPassword.isBlank() || !confirmNewPassword.isBlank()) {
+			if (newPassword.length() < 8) {
+				throw new AppException(HttpStatus.BAD_REQUEST, "New password must be at least 8 characters.");
+			}
 			if (!newPassword.equals(confirmNewPassword)) {
 				throw new AppException(HttpStatus.BAD_REQUEST, "New password and confirm password must match.");
 			}
@@ -149,7 +155,8 @@ public class AuthService {
 				user.getLastName(),
 				displayName,
 				user.getRole(),
-				user.getAuthProvider());
+				user.getAuthProvider(),
+				user.getProfilePictureUrl());
 	}
 
 	private UserDocument findOrCreateGoogleUser(OAuth2User oauthUser) {
@@ -179,6 +186,7 @@ public class AuthService {
 				.lastName(resolveLastName(oauthUser))
 				.passwordHash(null)
 				.role(UserRole.USER)
+				.profilePictureUrl(stringAttribute(oauthUser, "picture"))
 				.createdAt(Instant.now())
 				.build();
 

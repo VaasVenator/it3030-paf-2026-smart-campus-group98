@@ -1,3 +1,6 @@
+/**
+ * Implementation by Member 4: Notifications + role management + OAuth integration improvements.
+ */
 package com.vaas.paf.auth.controller;
 
 import org.springframework.security.core.Authentication;

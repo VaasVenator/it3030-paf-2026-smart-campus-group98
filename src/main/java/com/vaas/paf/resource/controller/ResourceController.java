@@ -1,3 +1,6 @@
+/**
+ * Implementation by Member 1: Facilities catalogue + resource management.
+ */
 package com.vaas.paf.resource.controller;
 
 import org.springframework.http.HttpStatus;

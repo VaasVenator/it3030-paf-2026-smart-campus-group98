@@ -12,5 +12,6 @@ public record AuthUserResponse(
 		String lastName,
 		String displayName,
 		UserRole role,
-		AuthProvider authProvider) {
+		AuthProvider authProvider,
+		String profilePictureUrl) {
 }
