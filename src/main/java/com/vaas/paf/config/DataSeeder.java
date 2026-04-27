@@ -1,6 +1,7 @@
 package com.vaas.paf.config;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.boot.ApplicationArguments;
@@ -25,7 +26,7 @@ public class DataSeeder implements ApplicationRunner {
 	public void run(ApplicationArguments args) {
 		resourceRepository.deleteAll();
 
-		resourceRepository.saveAll(List.of(
+		List<ResourceDocument> resources = new ArrayList<>(List.of(
 				ResourceDocument.builder()
 						.name("SLIIT Auditorium")
 						.type(ResourceType.LECTURE_HALL)
@@ -76,5 +77,7 @@ public class DataSeeder implements ApplicationRunner {
 						.status(ResourceStatus.ACTIVE)
 						.amenities(List.of("Bleachers", "Changing Rooms", "Floodlights"))
 						.build()));
+		
+		resourceRepository.saveAll(resources);
 	}
 }

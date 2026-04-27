@@ -34,6 +34,7 @@ export default function BookingsPage() {
   const [statusFilter, setStatusFilter] = useState("");
   const [form, setForm] = useState(buildInitialForm());
   const [reviewReason, setReviewReason] = useState({});
+  const [validationErrors, setValidationErrors] = useState({}); // Per-event validation errors
   const [editingBookingId, setEditingBookingId] = useState("");
 
   const bookingEndpoint = useMemo(() => {
@@ -51,6 +52,7 @@ export default function BookingsPage() {
   async function loadBookings() {
     try {
       setLoading(true);
+      setValidationErrors({}); // Clear all validation errors
       const payload = await apiGet(bookingEndpoint, user);
       setBookings(Array.isArray(payload) ? payload : []);
       setError("");
@@ -152,6 +154,17 @@ export default function BookingsPage() {
     try {
       setError("");
       setMessage("");
+      setValidationErrors((prev) => ({ ...prev, [bookingId]: "" })); // Clear previous error
+      
+      // Validation: require reason for rejection
+      if (decision === "REJECTED") {
+        const reason = reviewReason[bookingId]?.trim() ?? "";
+        if (!reason) {
+          setValidationErrors((prev) => ({ ...prev, [bookingId]: "Rejection reason is required." }));
+          return;
+        }
+      }
+      
       await apiPatch(`/api/bookings/${bookingId}/review`, {
         decision,
         reason: reviewReason[bookingId] ?? ""
@@ -349,19 +362,28 @@ export default function BookingsPage() {
                   <div className="action-row" style={{ alignItems: "flex-end" }}>
                     {isAdmin && booking.status === "PENDING" ? (
                       <div className="field" style={{ flex: 1, minWidth: "280px" }}>
-                        <span>Review reason</span>
+                        <span>Review reason <span style={{ color: "var(--danger)" }}>* (required if rejecting)</span></span>
                         <textarea
                           className="booking-review-textarea"
-                          placeholder="Optional review reason"
+                          placeholder="Provide a reason for rejection (required for reject action)..."
                           style={{ minHeight: "60px" }}
                           value={reviewReason[booking.id] ?? ""}
-                          onChange={(event) =>
+                          onChange={(event) => {
                             setReviewReason((current) => ({
                               ...current,
                               [booking.id]: event.target.value
-                            }))
-                          }
+                            }));
+                            // Clear error when user starts typing
+                            if (validationErrors[booking.id] && event.target.value.trim()) {
+                              setValidationErrors((prev) => ({ ...prev, [booking.id]: "" }));
+                            }
+                          }}
                         />
+                        {validationErrors[booking.id] && (
+                          <p style={{ color: "var(--danger)", fontSize: "0.85rem", marginTop: "0.5rem" }}>
+                            ✕ {validationErrors[booking.id]}
+                          </p>
+                        )}
                       </div>
                     ) : null}
 

@@ -4,6 +4,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.mongodb.core.index.Index;
 
 @SpringBootApplication
 public class PafApplication {
@@ -22,12 +23,13 @@ public class PafApplication {
 			}
 			// Manually create the sparse unique index
 			try {
-				mongoTemplate.indexOps("users").ensureIndex(
-					new org.springframework.data.mongodb.core.index.Index()
-						.on("studentId", org.springframework.data.domain.Sort.Direction.ASC)
-						.unique()
-						.sparse()
-				);
+				Index index = new Index()
+					.on("studentId", org.springframework.data.domain.Sort.Direction.ASC)
+					.unique()
+					.sparse();
+				var indexOps = mongoTemplate.indexOps("users");
+				@SuppressWarnings("deprecation")
+				var result = indexOps.ensureIndex(index);
 			} catch (Exception e) {
 				System.err.println("Failed to create index: " + e.getMessage());
 			}

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import PageHeader from "../components/PageHeader";
 import StatusBadge from "../components/StatusBadge";
+import BookingEditForm from "../components/BookingEditForm";
+import TicketEditForm from "../components/TicketEditForm";
 import { useAuth } from "../auth/AuthContext";
-import { apiGet, apiPatch } from "../lib/api";
+import { apiGet, apiPatch, apiPut } from "../lib/api";
 
 export default function AdminDashboardPage() {
   const { user } = useAuth();
@@ -14,10 +16,15 @@ export default function AdminDashboardPage() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [reviewReason, setReviewReason] = useState({});
+  const [validationErrors, setValidationErrors] = useState({}); // Per-event validation errors
   const [stats, setStats] = useState({
     mostBooked: [],
     priorityDist: {}
   });
+  const [editMode, setEditMode] = useState(null); // null, "booking", or "ticket"
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [selectedTicket, setSelectedTicket] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -27,6 +34,7 @@ export default function AdminDashboardPage() {
     try {
       setLoading(true);
       setError("");
+      setValidationErrors({}); // Clear all validation errors
       if (activeTab === "bookings") {
         const payload = await apiGet("/api/bookings?status=PENDING", user);
         setBookings(Array.isArray(payload) ? payload : []);
@@ -66,6 +74,17 @@ export default function AdminDashboardPage() {
     try {
       setError("");
       setMessage("");
+      setValidationErrors((prev) => ({ ...prev, [bookingId]: "" })); // Clear previous error
+      
+      // Validation: require reason for rejection
+      if (decision === "REJECTED") {
+        const reason = reviewReason[bookingId]?.trim() ?? "";
+        if (!reason) {
+          setValidationErrors((prev) => ({ ...prev, [bookingId]: "Rejection reason is required." }));
+          return;
+        }
+      }
+      
       await apiPatch(`/api/bookings/${bookingId}/review`, {
         decision,
         reason: reviewReason[bookingId] ?? ""
@@ -81,14 +100,89 @@ export default function AdminDashboardPage() {
     try {
       setError("");
       setMessage("");
-      await apiPatch(`/api/tickets/${ticketId}/status`, {
-        status,
-        resolutionNotes: "Reviewed by Admin"
-      }, user);
+      setValidationErrors((prev) => ({ ...prev, [ticketId]: "" })); // Clear previous error
+      
+      // Validation: require resolution notes for rejection
+      if (status === "REJECTED") {
+        const resolutionNotes = reviewReason[ticketId]?.trim() ?? "";
+        if (!resolutionNotes) {
+          setValidationErrors((prev) => ({ ...prev, [ticketId]: "Rejection reason is required." }));
+          return;
+        }
+        
+        await apiPatch(`/api/tickets/${ticketId}/status`, {
+          status,
+          resolutionNotes: resolutionNotes
+        }, user);
+      } else {
+        await apiPatch(`/api/tickets/${ticketId}/status`, {
+          status,
+          resolutionNotes: "Reviewed by Admin"
+        }, user);
+      }
+      
       setMessage(`Ticket status updated to ${status.toLowerCase()}.`);
       await loadData();
     } catch (err) {
       setError(err.message);
+    }
+  }
+
+  function openEditBooking(booking) {
+    setSelectedBooking(booking);
+    setEditMode("booking");
+    setError("");
+    setMessage("");
+  }
+
+  function openEditTicket(ticket) {
+    setSelectedTicket(ticket);
+    setEditMode("ticket");
+    setError("");
+    setMessage("");
+  }
+
+  function closeEditForm() {
+    setEditMode(null);
+    setSelectedBooking(null);
+    setSelectedTicket(null);
+  }
+
+  async function handleUpdateBooking(payload) {
+    if (!selectedBooking) {
+      return;
+    }
+    try {
+      setSaving(true);
+      setError("");
+      setMessage("");
+      await apiPut(`/api/bookings/${selectedBooking.id}`, payload, user);
+      setMessage("Booking updated successfully.");
+      closeEditForm();
+      await loadData();
+    } catch (updateError) {
+      setError(updateError.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleUpdateTicket(payload) {
+    if (!selectedTicket) {
+      return;
+    }
+    try {
+      setSaving(true);
+      setError("");
+      setMessage("");
+      await apiPut(`/api/tickets/${selectedTicket.id}`, payload, user);
+      setMessage("Ticket updated successfully.");
+      closeEditForm();
+      await loadData();
+    } catch (updateError) {
+      setError(updateError.message);
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -155,13 +249,28 @@ export default function AdminDashboardPage() {
               </div>
               
               <div className="admin-booking-actions" style={{ marginTop: "1.5rem" }}>
+                <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.9rem", color: "var(--text-soft)" }}>
+                  <strong>Rejection Reason:</strong> Required if rejecting
+                </label>
                 <textarea
                   className="booking-review-textarea"
-                  placeholder="Optional review reason..."
+                  placeholder="Provide a reason for rejection (required for reject action)..."
                   value={reviewReason[booking.id] ?? ""}
-                  onChange={(e) => setReviewReason({...reviewReason, [booking.id]: e.target.value})}
+                  onChange={(e) => {
+                    setReviewReason({...reviewReason, [booking.id]: e.target.value});
+                    // Clear error when user starts typing
+                    if (validationErrors[booking.id] && e.target.value.trim()) {
+                      setValidationErrors((prev) => ({ ...prev, [booking.id]: "" }));
+                    }
+                  }}
                 />
+                {validationErrors[booking.id] && (
+                  <p style={{ color: "var(--danger)", fontSize: "0.85rem", marginTop: "0.5rem" }}>
+                    ✕ {validationErrors[booking.id]}
+                  </p>
+                )}
                 <div className="action-row" style={{ marginTop: "1rem" }}>
+                  <button className="secondary-button" style={{ width: "auto", marginTop: 0 }} onClick={() => openEditBooking(booking)}>Edit</button>
                   <button className="primary-button" style={{ width: "auto", marginTop: 0 }} onClick={() => handleBookingReview(booking.id, "APPROVED")}>Approve</button>
                   <button className="danger-button" style={{ width: "auto", marginTop: 0 }} onClick={() => handleBookingReview(booking.id, "REJECTED")}>Reject</button>
                 </div>
@@ -187,7 +296,31 @@ export default function AdminDashboardPage() {
                 <span>Reporter: {ticket.reporterName}</span>
               </div>
               
-              <div className="action-row" style={{ marginTop: "1.5rem" }}>
+              <div style={{ marginTop: "1.5rem" }}>
+                <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.9rem", color: "var(--text-soft)" }}>
+                  <strong>Rejection Reason:</strong> Required if rejecting
+                </label>
+                <textarea
+                  className="booking-review-textarea"
+                  placeholder="Provide a reason for rejection (required for reject action)..."
+                  value={reviewReason[ticket.id] ?? ""}
+                  onChange={(e) => {
+                    setReviewReason({...reviewReason, [ticket.id]: e.target.value});
+                    // Clear error when user starts typing
+                    if (validationErrors[ticket.id] && e.target.value.trim()) {
+                      setValidationErrors((prev) => ({ ...prev, [ticket.id]: "" }));
+                    }
+                  }}
+                  style={{ marginBottom: "0.5rem" }}
+                />
+                {validationErrors[ticket.id] && (
+                  <p style={{ color: "var(--danger)", fontSize: "0.85rem", marginBottom: "1rem" }}>
+                    ✕ {validationErrors[ticket.id]}
+                  </p>
+                )}
+              </div>
+              <div className="action-row" style={{ marginTop: "1rem" }}>
+                <button className="secondary-button" style={{ width: "auto", marginTop: 0 }} onClick={() => openEditTicket(ticket)}>Edit</button>
                 <button className="primary-button" style={{ width: "auto", marginTop: 0 }} onClick={() => handleTicketStatus(ticket.id, "IN_PROGRESS")}>Accept Ticket</button>
                 <button className="danger-button" style={{ width: "auto", marginTop: 0 }} onClick={() => handleTicketStatus(ticket.id, "REJECTED")}>Reject Ticket</button>
               </div>
@@ -228,6 +361,24 @@ export default function AdminDashboardPage() {
             </div>
           </div>
         </div>
+      )}
+      
+      {editMode === "booking" && selectedBooking && (
+        <BookingEditForm
+          booking={selectedBooking}
+          onCancel={closeEditForm}
+          onSubmit={handleUpdateBooking}
+          loading={saving}
+        />
+      )}
+      
+      {editMode === "ticket" && selectedTicket && (
+        <TicketEditForm
+          ticket={selectedTicket}
+          onCancel={closeEditForm}
+          onSubmit={handleUpdateTicket}
+          loading={saving}
+        />
       )}
     </section>
   );

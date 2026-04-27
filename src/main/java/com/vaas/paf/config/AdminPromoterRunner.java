@@ -17,6 +17,7 @@ public class AdminPromoterRunner implements ApplicationRunner {
 	}
 
 	@Override
+	@SuppressWarnings("null")
 	public void run(ApplicationArguments args) {
 		if (args.containsOption("list-users")) {
 			System.out.println("--- CAMPUS HUB USER LIST ---");
@@ -28,7 +29,12 @@ public class AdminPromoterRunner implements ApplicationRunner {
 		}
 
 		if (args.containsOption("promote-admin")) {
-			String identifier = args.getOptionValues("promote-admin").get(0);
+			var identifierValues = args.getOptionValues("promote-admin");
+			if (identifierValues == null || identifierValues.isEmpty()) {
+				System.err.println("ADMIN_PROMOTER ERROR: No identifier provided.");
+				return;
+			}
+			String identifier = identifierValues.get(0);
 			
 			// Try finding by ID, then Username, then Student ID
 			userRepository.findById(identifier)

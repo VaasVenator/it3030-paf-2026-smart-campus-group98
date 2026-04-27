@@ -45,7 +45,7 @@ class AuthServiceTest {
 
 	@Test
 	void signupShouldRejectMismatchedPasswords() {
-		SignupRequest request = new SignupRequest("IT12345678", "sahan", "Sahan", "Vaas", "password1", "password2");
+		SignupRequest request = new SignupRequest("IT12345678", "sahan", "Sahan", "Vaas", "password1", "password2", null);
 		AppException exception = assertThrows(AppException.class, () -> authService.signup(request));
 		assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
 	}
@@ -73,7 +73,7 @@ class AuthServiceTest {
 
 	@Test
 	void signupShouldCreateUserWhenValid() {
-		SignupRequest request = new SignupRequest("IT12345678", "sahan", "Sahan", "Vaas", "password1", "password1");
+		SignupRequest request = new SignupRequest("IT12345678", "sahan", "Sahan", "Vaas", "password1", "password1", null);
 		when(userRepository.existsByStudentId("IT12345678")).thenReturn(false);
 		when(userRepository.existsByUsernameIgnoreCase("sahan")).thenReturn(false);
 		when(passwordEncoder.encode("password1")).thenReturn("hashed");
@@ -110,6 +110,7 @@ class AuthServiceTest {
 						"sahan",
 						"Sahan",
 						"Vaas",
+						null,
 						"password1",
 						"password2")));
 		assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
