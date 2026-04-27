@@ -28,7 +28,7 @@ public class PafApplication {
 					.unique()
 					.sparse();
 				var indexOps = mongoTemplate.indexOps("users");
-				indexOps.ensureIndex(index);
+				indexOps.createIndex(index);
 			} catch (Exception e) {
 				System.err.println("Failed to create index: " + e.getMessage());
 			}
