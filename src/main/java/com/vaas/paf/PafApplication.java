@@ -28,8 +28,7 @@ public class PafApplication {
 					.unique()
 					.sparse();
 				var indexOps = mongoTemplate.indexOps("users");
-				@SuppressWarnings("deprecation")
-				var result = indexOps.ensureIndex(index);
+				indexOps.ensureIndex(index);
 			} catch (Exception e) {
 				System.err.println("Failed to create index: " + e.getMessage());
 			}
